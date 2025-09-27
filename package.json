@@ -21,6 +21,7 @@
     "@rn-primitives/progress": "^1.2.0",
     "@rn-primitives/radio-group": "^1.2.0",
     "@rn-primitives/slot": "^1.2.0",
+    "axios": "^1.12.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "expo": "^54.0.10",
