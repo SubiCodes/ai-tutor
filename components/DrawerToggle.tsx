@@ -9,6 +9,7 @@ const DrawerToggle = () => {
     return (
         <Button
             onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+            className='bg-transparent border-0 p-0 mr-4'
         >
             <Text className='text-secondary-foreground'><AntDesign name="menu" size={24} /></Text>
         </Button>
