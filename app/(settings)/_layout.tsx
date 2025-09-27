@@ -1,9 +1,9 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'react-native';
-import { DrawerToggleButton } from '@react-navigation/drawer';
 import { useColorScheme } from 'nativewind';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
+import DrawerToggle from '@/components/DrawerToggle';
 
 export default function AuthLayout() {
   const { colorScheme } = useColorScheme();
@@ -16,7 +16,7 @@ export default function AuthLayout() {
           options={{
             title: 'Settings',
             headerShown: true,
-            headerLeft: () => <DrawerToggleButton tintColor="#3B82F6"/>,
+            headerLeft: () => <DrawerToggle/>,
           }}
         />
         <Stack.Screen
