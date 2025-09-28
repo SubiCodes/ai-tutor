@@ -105,6 +105,7 @@ const HomeLandingPage = () => {
     const clearFile = async () => {
         try {
             await AsyncStorage.removeItem("tutorKnowledge");
+            await deleteEmbeddingsTableData(db!);
             setFile(null);
         } catch (err) {
             console.error("Error removing file:", err);
