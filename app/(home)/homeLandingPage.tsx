@@ -13,12 +13,12 @@ import AlertLoadingWithState from '@/components/AlertLoadingWithState';
 import { Button } from '@/components/ui/button';
 import { extractTextFromFile } from '@/util/textExtractionFromFiles';
 import { getEmbedding } from '@/util/embedUploadedText';
+import { chunkText } from '@/util/chunkText';
 
 const HomeLandingPage = () => {
     const [file, setFile] = useState<any>(null);
-    const [uploadingState, setUploadingState] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [uploadingProgress, setUploadingProgress] = useState<number>(0);
+    const [uploadProgress, setUploadProgress] = useState<{ percentage: number, message: string }>({ percentage: 0, message: "" });
 
     const getCurrentFile = async () => {
         const stored = await AsyncStorage.getItem("tutorKnowledge");
@@ -42,8 +42,7 @@ const HomeLandingPage = () => {
 
             if (result.canceled) return;
 
-            setUploadingState("Uploading...");
-            setUploadingProgress(24);
+            setUploadProgress((prev) => ({ percentage: 24, message: "Uploading..." }));
 
             const fileData = result.assets[0];
 
@@ -53,34 +52,27 @@ const HomeLandingPage = () => {
                 mimeType: fileData.mimeType,
             };
 
-            setUploadingState("Extracting data...");
-            setUploadingProgress(52);
+            setUploadProgress((prev) => ({ percentage: 44, message: "Extracting data..." }));
 
             const res = await extractTextFromFile(storedFile);
 
-            if (!res.success) { return };
+            if (!res.success || !res.text) { return }; //TODO: Create a better alert component
+            
+            setUploadProgress((prev) => ({ percentage: 60, message: "Embedding data..." }));
+            const chunks = chunkText(res.text, 500);
+            console.log("CHUNKS: ", chunks);
+            for (let chunk of chunks) {
+                const embeddedText = await getEmbedding(chunk);
+                console.log("EMBEDDED: ", embeddedText);
+            }
 
-            if (res.text && res.text.length) {
-
-                setUploadingState("Embedding data...");
-                setUploadingProgress(60);
-
-                const embeddedText = await getEmbedding(res.text);
-                console.log(embeddedText);  
-                setUploadingState("Storing data...");
-                setUploadingProgress(80);
-                
-            } else {
-                //TODO: Create a better alert component
-                return Alert.alert("Unable to embed file", "No text found in the uploaded file.");
-            };
+            setUploadProgress((prev) => ({ percentage: 70, message: "Storing data..." }));
 
         } catch (error) {
             console.error("Error picking or processing file:", error);
         } finally {
             setIsUploading(false);
-            setUploadingState(null);
-            setUploadingProgress(0);
+            setUploadProgress((prev) => ({ percentage: 0, message: "" }));
         }
     };
 
@@ -114,7 +106,7 @@ const HomeLandingPage = () => {
 
     return (
         <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 pt-4" edges={["left", "right", "bottom"]}>
-            <AlertLoadingWithState open={isUploading} onOpenChange={() => { }} currentState={uploadingState} activity="Processing File" progress={uploadingProgress} />
+            <AlertLoadingWithState open={isUploading} onOpenChange={() => { }} currentState={uploadProgress.message} activity="Processing File" progress={uploadProgress.percentage} />
 
             <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
                 <Button onPress={() => test()}><Text>TEST</Text></Button>
