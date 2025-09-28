@@ -3,6 +3,7 @@ import React, { useCallback, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
+import * as DocumentPicker from "expo-document-picker";
 
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AlertLoadingWithState from '@/components/AlertLoadingWithState';
 import { Button } from '@/components/ui/button';
+import { extractTextFromFile } from '@/util/textExtractionFromFiles';
+import { getEmbedding } from '@/util/embedUploadedText';
 
 const HomeLandingPage = () => {
     const [file, setFile] = useState<any>(null);
@@ -23,9 +26,67 @@ const HomeLandingPage = () => {
             setFile(JSON.parse(stored));
         }
     };
-    
-    const pickFile = async () => {
 
+    const pickFile = async () => {
+        setIsUploading(true);
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: [
+                    "text/plain",
+                    "application/pdf",
+                    "application/msword",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ],
+                copyToCacheDirectory: true,
+            });
+
+            if (result.canceled) return;
+
+            setUploadingState("Uploading...");
+            setUploadingProgress(24);
+
+            const fileData = result.assets[0];
+
+            const storedFile = {
+                uri: fileData.uri,
+                name: fileData.name,
+                mimeType: fileData.mimeType,
+            };
+
+            setUploadingState("Extracting data...");
+            setUploadingProgress(52);
+
+            const res = await extractTextFromFile(storedFile);
+
+            if (!res.success) { return };
+
+            if (res.text && res.text.length) {
+
+                setUploadingState("Embedding data...");
+                setUploadingProgress(60);
+
+                const embeddedText = await getEmbedding(res.text);
+                console.log(embeddedText);  
+                setUploadingState("Storing data...");
+                setUploadingProgress(80);
+                
+            } else {
+                //TODO: Create a better alert component
+                return Alert.alert("Unable to embed file", "No text found in the uploaded file.");
+            };
+
+        } catch (error) {
+            console.error("Error picking or processing file:", error);
+        } finally {
+            setIsUploading(false);
+            setUploadingState(null);
+            setUploadingProgress(0);
+        }
+    };
+
+    const test = async () => {
+        // const allEmbeddings = await getAllEmbeddings();
+        // console.log(allEmbeddings);
     }
 
     const clearFile = async () => {
@@ -56,7 +117,7 @@ const HomeLandingPage = () => {
             <AlertLoadingWithState open={isUploading} onOpenChange={() => { }} currentState={uploadingState} activity="Processing File" progress={uploadingProgress} />
 
             <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
-
+                <Button onPress={() => test()}><Text>TEST</Text></Button>
                 {/* UPLOAD FILE */}
                 <View className="flex flex-col w-full gap-4 mb-6">
                     <Text className="text-xl font-bold text-foreground">
