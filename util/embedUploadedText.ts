@@ -1,19 +1,24 @@
 import axios from 'axios';
 
-export const getEmbedding = async (text: string) => {
-  const apiKey = 'AIzaSyB8t6XppQu9OIf3jsVyFy89tGsrjeTPekg';
-  const modelName = 'gemini-embedding-001'; 
-  
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:embedContent?key=${apiKey}`;
+export const getBatchEmbeddings = async (texts: string[]) => {
+  const apiKey = 'AIzaSyCRQvRE011q_ttoN6rE8LCnPJPQX6ogaVk';
+  const modelName = 'gemini-embedding-001';
+  const modelResource = `models/${modelName}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:batchEmbedContents?key=${apiKey}`;
+
+  const requests = texts.map(text => ({
+    model: modelResource,
+    content: { parts: [{ text }] },
+  }));
 
   try {
     const response = await axios.post(url, {
-      content: { parts: [{ text }] },
+      requests: requests
     });
 
-    return response.data.embedding.values;
+    return response.data.embeddings.map((e: { values: number[] }) => e.values);
   } catch (error: any) {
-    console.error('Error getting embedding:', error.response?.data || error);
+    console.error('Error getting batch embeddings:', error.response?.data || error);
     throw error;
   }
 };

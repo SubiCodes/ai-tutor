@@ -1,9 +1,10 @@
 import { View, Text, Alert, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import * as DocumentPicker from "expo-document-picker";
+import * as SQLite from 'expo-sqlite';
 
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { Ionicons } from "@expo/vector-icons";
@@ -12,10 +13,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AlertLoadingWithState from '@/components/AlertLoadingWithState';
 import { Button } from '@/components/ui/button';
 import { extractTextFromFile } from '@/util/textExtractionFromFiles';
-import { getEmbedding } from '@/util/embedUploadedText';
+import { getBatchEmbeddings } from '@/util/embedUploadedText';
 import { chunkText } from '@/util/chunkText';
+import { postEmbeddedChunks, deleteEmbeddingsTableData, embeddingToUint8Array, getAllEmbeddings } from '@/db/storingEmbeddingChunksFunctions';
+import { getDb } from '@/db/db';
 
 const HomeLandingPage = () => {
+
+    const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+
     const [file, setFile] = useState<any>(null);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [uploadProgress, setUploadProgress] = useState<{ percentage: number, message: string }>({ percentage: 0, message: "" });
@@ -28,6 +34,10 @@ const HomeLandingPage = () => {
     };
 
     const pickFile = async () => {
+        if (!db) {
+            console.warn("Database not ready yet!");
+            return;
+        }
         setIsUploading(true);
         try {
             const result = await DocumentPicker.getDocumentAsync({
@@ -57,13 +67,19 @@ const HomeLandingPage = () => {
             const res = await extractTextFromFile(storedFile);
 
             if (!res.success || !res.text) { return }; //TODO: Create a better alert component
-            
+
             setUploadProgress((prev) => ({ percentage: 60, message: "Embedding data..." }));
             const chunks = chunkText(res.text, 500);
             console.log("CHUNKS: ", chunks);
-            for (let chunk of chunks) {
-                const embeddedText = await getEmbedding(chunk);
-                console.log("EMBEDDED: ", embeddedText);
+            const allEmbeddings = await getBatchEmbeddings(chunks);
+            console.log("All EMBEDDINGS: ", chunks);
+            await deleteEmbeddingsTableData(db);
+            for (let i = 0; i < chunks.length; i++) {
+                const embeddingArr = allEmbeddings[i];
+                await postEmbeddedChunks(db, {
+                    text: chunks[i],
+                    embedding: embeddingToUint8Array(embeddingArr),
+                });
             }
 
             setUploadProgress((prev) => ({ percentage: 70, message: "Storing data..." }));
@@ -77,8 +93,7 @@ const HomeLandingPage = () => {
     };
 
     const test = async () => {
-        // const allEmbeddings = await getAllEmbeddings();
-        // console.log(allEmbeddings);
+        getAllEmbeddings(db!);
     }
 
     const clearFile = async () => {
@@ -96,6 +111,13 @@ const HomeLandingPage = () => {
             { text: "Delete", style: "destructive", onPress: clearFile },
         ]);
     };
+
+    useEffect(() => {
+        (async () => {
+            const database = await getDb();
+            setDb(database);
+        })();
+    }, []);
 
     useFocusEffect(
         useCallback(() => {
