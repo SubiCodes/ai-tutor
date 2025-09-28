@@ -82,7 +82,13 @@ const HomeLandingPage = () => {
                 });
             }
 
-            setUploadProgress((prev) => ({ percentage: 70, message: "Storing data..." }));
+            setUploadProgress((prev) => ({ percentage: 90, message: "Finalizing..." }));
+
+
+            await AsyncStorage.setItem("tutorKnowledge", JSON.stringify(storedFile));
+            setFile(storedFile);
+
+            setUploadProgress((prev) => ({ percentage: 90, message: "Done..." }));
 
         } catch (error) {
             console.error("Error picking or processing file:", error);
