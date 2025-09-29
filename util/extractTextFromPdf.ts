@@ -27,7 +27,7 @@ export const extractTextFromPdf = async (pdf: FileType): Promise<ExtractedTextRe
                 headers: {
                     Accept: "application/json",
                     "Content-Type": "multipart/form-data",
-                    "Api-Key": "0a85a830-5560-4a45-b6ac-f4b569625351",
+                    "Api-Key": process.env.EXPO_PUBLIC_API_PDFREST,
                 },
             }
         );
