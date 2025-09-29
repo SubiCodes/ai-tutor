@@ -19,6 +19,7 @@ import { postEmbeddedChunks, deleteEmbeddingsTableData, embeddingToUint8Array, g
 import { getDb } from '@/db/db';
 import AlertError from '@/components/AlertError';
 import Toast, { Toast as ToastFunc } from 'toastify-react-native'
+import { deleteConversationTableData } from '@/db/conversationFunctions';
 
 const HomeLandingPage = () => {
 
@@ -79,6 +80,7 @@ const HomeLandingPage = () => {
             const chunks = chunkText(res.text, 500);
             const allEmbeddings = await getBatchEmbeddings(chunks);
             await deleteEmbeddingsTableData(db);
+            await deleteConversationTableData(db);
 
             for (let i = 0; i < chunks.length; i++) {
                 const embeddingArr = allEmbeddings[i];
