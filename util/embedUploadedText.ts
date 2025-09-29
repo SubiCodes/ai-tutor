@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const getBatchEmbeddings = async (texts: string[]) => {
-  const apiKey = 'AIzaSyCRQvRE011q_ttoN6rE8LCnPJPQX6ogaVk';
+  const apiKey = process.env.EXPO_PUBLIC_API_GEMINI;
   const modelName = 'gemini-embedding-001';
   const modelResource = `models/${modelName}`;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:batchEmbedContents?key=${apiKey}`;
