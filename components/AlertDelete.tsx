@@ -36,8 +36,8 @@ const AlertDelete = ({ open, onOpenChange, onClose, onDelete, title, description
           <AlertDialogCancel onPress={() => onClose()}>
             <Text>Cancel</Text>
           </AlertDialogCancel>
-          <AlertDialogAction onPress={() => onDelete()} className='bg-red-400'>
-            <Text>{continueButtonText}</Text>
+          <AlertDialogAction onPress={() => onDelete()} className='bg-red-400 active:bg-red-500'>
+            <Text className='bg-transparent'>{continueButtonText}</Text>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
