@@ -25,6 +25,7 @@ const HomeLandingPage = () => {
     const [file, setFile] = useState<any>(null);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [uploadProgress, setUploadProgress] = useState<{ percentage: number, message: string }>({ percentage: 0, message: "" });
+    const [errorUploading, setErrorUploading] = useState<{ error: boolean, message: string }>({ error: false, message: '' });
 
     const getCurrentFile = async () => {
         const stored = await AsyncStorage.getItem("tutorKnowledge");
@@ -66,14 +67,16 @@ const HomeLandingPage = () => {
 
             const res = await extractTextFromFile(storedFile);
 
-            if (!res.success || !res.text) { return }; //TODO: Create a better alert component
+            if (!res.success || !res.text) {
+                setErrorUploading({ error: true, message: "No information extracted from file" });
+                return
+            };
 
             setUploadProgress((prev) => ({ percentage: 60, message: "Embedding data..." }));
             const chunks = chunkText(res.text, 500);
-            console.log("CHUNKS: ", chunks);
             const allEmbeddings = await getBatchEmbeddings(chunks);
-            console.log("All EMBEDDINGS: ", chunks);
             await deleteEmbeddingsTableData(db);
+
             for (let i = 0; i < chunks.length; i++) {
                 const embeddingArr = allEmbeddings[i];
                 await postEmbeddedChunks(db, {
@@ -84,7 +87,6 @@ const HomeLandingPage = () => {
 
             setUploadProgress((prev) => ({ percentage: 90, message: "Finalizing..." }));
 
-
             await AsyncStorage.setItem("tutorKnowledge", JSON.stringify(storedFile));
             setFile(storedFile);
 
@@ -92,6 +94,7 @@ const HomeLandingPage = () => {
 
         } catch (error) {
             console.error("Error picking or processing file:", error);
+            setErrorUploading({ error: true, message: "Error processing file. Please try again." });
         } finally {
             setIsUploading(false);
             setUploadProgress((prev) => ({ percentage: 0, message: "" }));
