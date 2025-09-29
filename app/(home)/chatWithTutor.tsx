@@ -6,6 +6,7 @@ import * as SQLite from "expo-sqlite";
 import { getDb } from '@/db/db';
 import { getAllConversation } from '@/db/conversationFunctions';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Input } from '@/components/ui/input';
 
 const ChatWithTutor = () => {
 
@@ -42,10 +43,15 @@ const ChatWithTutor = () => {
 
 
   return (
-    <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 pt-4" edges={["left", "right", "bottom"]}>
+    <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 py-4" edges={["left", "right", "bottom"]}>
       <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
-        
+        {conversation.length === 0 && (
+          <View className="flex-1 justify-center items-center">
+
+          </View>
+        )}
       </ScrollView>
+      <Input className='w-full'/>
     </SafeAreaView>
   )
 }
