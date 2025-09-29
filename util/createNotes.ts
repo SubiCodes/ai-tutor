@@ -23,7 +23,7 @@ export const createStudyNotes = async (db: SQLite.SQLiteDatabase): Promise<strin
             ${fullLecture}
 
             Your task: Create concise, well-structured study notes from this lecture (Cheat Sheet format to be concise). 
-            Highlight key points, definitions, and examples in a way that's easy for a student to review.
+            Highlight key points, definitions, examples in a way that's easy for a student to review. Keep it short
             DO NOT EXCEED THE TOKEN LIMIT FOR FREE TIER
             `
           }

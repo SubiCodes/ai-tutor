@@ -7,7 +7,7 @@ import { getDb } from '@/db/db';
 import { deleteConversationTableData, getAllConversation, postToConversation } from '@/db/conversationFunctions';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle, TrashIcon } from 'lucide-react-native';
+import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle, TrashIcon,  } from 'lucide-react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFocusEffect, useNavigation } from 'expo-router';
