@@ -26,8 +26,7 @@ function cosineSimilarity(a: Float32Array, b: Float32Array): number {
     return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-async function getTopContext(queryEmbedding: number[], limit = 3): Promise<string> {
-    const db = await getDb();
+async function getTopContext(queryEmbedding: number[], limit = 3, db: SQLite.SQLiteDatabase): Promise<string> {
     const rows = await getAllEmbeddings(db);
 
     const queryVec = new Float32Array(queryEmbedding);
@@ -41,12 +40,9 @@ async function getTopContext(queryEmbedding: number[], limit = 3): Promise<strin
     return scored.slice(0, limit).map(r => r.text).join("\n\n");
 }
 
-export const getAIResponse = async (
-    conversationHistory: Content[],
-    newPrompt: string
-): Promise<string> => {
+export const getAIResponse = async ( conversationHistory: Content[], newPrompt: string, db: SQLite.SQLiteDatabase): Promise<string> => {
     const queryEmbedding = await embedUserQuery(newPrompt);
-    const context = await getTopContext(queryEmbedding);
+    const context = await getTopContext(queryEmbedding, 3, db);
     const lecturePosted = await AsyncStorage.getItem("tutorKnowledge");
 
     const apiKey = process.env.EXPO_PUBLIC_API_GEMINI;
