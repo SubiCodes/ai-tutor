@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Content, getAIResponse } from '@/util/conversationalAI';
@@ -75,6 +75,7 @@ const ChatWithTutor = () => {
 
   const askAi = async (query: string) => {
     setIsTutorThinking(true);
+    Keyboard.dismiss();
     try {
       if (!db) return;
       if (!query.trim()) return;
