@@ -15,3 +15,7 @@ export const getAllConversation = async (db: SQLite.SQLiteDatabase) => {
     const allRows = await db.getAllAsync('SELECT * FROM conversation');
     return allRows as { id: number; role: string; message: string }[];
 }
+
+export const deleteConversationTableData = async (db: SQLite.SQLiteDatabase) => {
+    await db.execAsync("DELETE FROM conversation;");
+};
