@@ -11,6 +11,7 @@ import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle } from 'luc
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFocusEffect } from 'expo-router';
+import Markdown from 'react-native-markdown-display';
 
 const suggestions = [
   { icon: BookOpen, text: "Explain a concept from my lecture", color: "text-blue-500" },
@@ -140,12 +141,17 @@ const ChatWithTutor = () => {
                       : 'bg-gray-100 rounded-bl-sm'
                       }`}
                   >
-                    <Text
-                      className={`text-base ${message.role === 'user' ? 'text-white' : 'text-gray-900'
-                        }`}
-                    >
-                      {message.parts[0]?.text}
-                    </Text>
+                    {message.role === 'user' ? (
+                      <Text
+                        className={`text-base ${message.role === 'user' ? 'text-white' : 'text-gray-900'
+                          }`}
+                      >
+                        {message.parts[0]?.text}
+                      </Text>
+                    ) : (
+                      <Markdown>{message.parts[0]?.text}</Markdown>
+                    )}
+
                   </View>
                 </View>
               ))}
