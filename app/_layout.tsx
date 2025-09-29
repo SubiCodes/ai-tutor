@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 export {
   ErrorBoundary,
@@ -55,29 +56,31 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <AlertPersonalization open={openPersonalizationAlert} onOpenChange={setOpenPersonalizationAlert} />
-      <Drawer screenOptions={{
-        headerTintColor: "#3B82F6",
-        drawerActiveTintColor: "#3B82F6",
-        drawerInactiveTintColor: "#9CA3AF",
-        drawerActiveBackgroundColor: "#E0F2FE",
-      }}>
-        <Drawer.Screen name="(home)" options={{
-          headerShown: false, drawerLabel: "Home",
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }} />
-        <Drawer.Screen name="(settings)" options={{
-          headerShown: false, drawerLabel: "Settings", title: "Settings",
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
-          ),
-        }} />
-      </Drawer>
-      <PortalHost />
-    </ThemeProvider>
+    <KeyboardProvider>
+      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <AlertPersonalization open={openPersonalizationAlert} onOpenChange={setOpenPersonalizationAlert} />
+        <Drawer screenOptions={{
+          headerTintColor: "#3B82F6",
+          drawerActiveTintColor: "#3B82F6",
+          drawerInactiveTintColor: "#9CA3AF",
+          drawerActiveBackgroundColor: "#E0F2FE",
+        }}>
+          <Drawer.Screen name="(home)" options={{
+            headerShown: false, drawerLabel: "Home",
+            drawerIcon: ({ color, size }) => (
+              <Ionicons name="home-outline" size={size} color={color} />
+            ),
+          }} />
+          <Drawer.Screen name="(settings)" options={{
+            headerShown: false, drawerLabel: "Settings", title: "Settings",
+            drawerIcon: ({ color, size }) => (
+              <Ionicons name="settings-outline" size={size} color={color} />
+            ),
+          }} />
+        </Drawer>
+        <PortalHost />
+      </ThemeProvider>
+    </KeyboardProvider>
   );
 }
