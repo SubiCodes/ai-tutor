@@ -7,8 +7,6 @@ export const postToConversation = async (
         "INSERT INTO conversation (role, message) VALUES (?, ?)",
         [param.role, param.message]
     );
-
-    console.log(`✅ Inserted rowId: ${result}`);
 };
 
 export const getAllConversation = async (db: SQLite.SQLiteDatabase) => {

@@ -1,15 +1,16 @@
 import { View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Content, getAIResponse } from '@/util/conversationalAI';
 import * as SQLite from "expo-sqlite";
 import { getDb } from '@/db/db';
-import { getAllConversation } from '@/db/conversationFunctions';
+import { getAllConversation, postToConversation } from '@/db/conversationFunctions';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle } from 'lucide-react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useFocusEffect } from 'expo-router';
 
 const suggestions = [
   { icon: BookOpen, text: "Explain a concept from my lecture", color: "text-blue-500" },
@@ -24,45 +25,73 @@ const ChatWithTutor = () => {
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [conversation, setConversation] = useState<Content[]>([]);
   const [prompt, setPrompt] = useState<string>('');
+  const conversationRef = useRef<Content[]>(conversation);
 
   const fetchRecentConversations = async () => {
     if (!db) return;
 
     const allRows = await getAllConversation(db);
-    //console.log("All conversation rows:", allRows);
+    // console.log("All conversation rows:", allRows);
 
     const mapped: Content[] = allRows.map((r) => ({
       role: r.role === "model" ? "model" : "user",
       parts: [{ text: r.message }],
     }));
 
-    //console.log("MAPPED Conversation:", mapped);
-    setConversation(mapped);
+    // console.log("MAPPED Conversation:", mapped);
+    conversationRef.current = mapped;
+    setConversation(conversationRef.current);
   };
 
   const askAi = async (query: string) => {
     if (!db) return;
-    const reply = await getAIResponse(conversation, query, db);
-  }
+    if (!query.trim()) return;
+
+    // Empty the query input box
+    setPrompt('');
+
+    // --- Update conversation immediately with user query
+    const userMessage: Content = { role: "user", parts: [{ text: query }] };
+    conversationRef.current = [...conversationRef.current, userMessage];
+    setConversation([...conversationRef.current]);
+
+    // --- Save user query to DB
+    await postToConversation(db, { role: 'user', message: query });
+
+    // --- 2Get AI response
+    const responseText = await getAIResponse(conversationRef.current, query, db);
+    const aiMessage: Content = { role: "model", parts: [{ text: responseText }] };
+
+    // --- Update conversation immediately with AI response
+    conversationRef.current = [...conversationRef.current, aiMessage];
+    setConversation([...conversationRef.current]);
+
+    // --- Save AI response to DB
+    await postToConversation(db, { role: 'model', message: responseText });
+  };
+
 
   useEffect(() => {
     (async () => {
       const database = await getDb();
       setDb(database);
     })();
+  }, []);
+
+  useFocusEffect(useCallback(() => {
     fetchRecentConversations();
-  }, [db]);
+  }, [db]));
 
 
   return (
-    <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 py-4 gap-2" edges={["left", "right", "bottom"]}>
+    <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 py-4 gap-2" edges={["left", "right", "bottom"]}>
       <KeyboardAvoidingView
         behavior="padding"
         style={{ flex: 1, width: '100%' }}
         keyboardVerticalOffset={100} // Adjust this value based on your header/navigation height
       >
         <ScrollView className="min-w-full flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-          {conversation.length === 0 && (
+          {conversation.length === 0 ? (
             <>
               <View className="items-center mb-8">
                 <View className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center mb-4">
@@ -97,13 +126,37 @@ const ChatWithTutor = () => {
                 })}
               </View>
             </>
+          ) : (
+            <>
+              {conversationRef.current.map((message, index) => (
+                <View
+                  key={index}
+                  className={`mb-4 flex-row ${message.role === 'user' ? 'justify-end' : 'justify-start'
+                    }`}
+                >
+                  <View
+                    className={`max-w-[80%] px-4 py-3 rounded-2xl ${message.role === 'user'
+                      ? 'bg-blue-500 rounded-br-sm'
+                      : 'bg-gray-100 rounded-bl-sm'
+                      }`}
+                  >
+                    <Text
+                      className={`text-base ${message.role === 'user' ? 'text-white' : 'text-gray-900'
+                        }`}
+                    >
+                      {message.parts[0]?.text}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </>
           )}
         </ScrollView>
         <View className="w-full pb-2 gap-2 bg-transparent flex-row">
-          <Input className='flex-1 border-gray-400' placeholder='Ask your tutor...' value={prompt} onChangeText={setPrompt}/>
-          <Button className={`bg-blue-500 w-auto items-center justify-center rounded-lg`} disabled={!prompt.trim()}>
+          <Input className='flex-1 border-gray-400' placeholder='Ask your tutor...' value={prompt} onChangeText={setPrompt} onSubmitEditing={() => askAi(prompt)} />
+          <Button className={`bg-blue-500 w-auto items-center justify-center rounded-lg`} disabled={!prompt.trim()} onPress={() => askAi(prompt)}>
             <Text className='text-white'>
-              <FontAwesome name="send-o" size={16}/>
+              <FontAwesome name="send-o" size={16} />
             </Text>
           </Button>
         </View>
