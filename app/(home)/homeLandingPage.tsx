@@ -20,6 +20,7 @@ import { getDb } from '@/db/db';
 import AlertError from '@/components/AlertError';
 import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 import { deleteConversationTableData } from '@/db/conversationFunctions';
+import { deleteCheatSheetTableData } from '@/db/cheatSheetFunctions';
 
 const HomeLandingPage = () => {
 
@@ -76,11 +77,16 @@ const HomeLandingPage = () => {
                 return
             };
 
-            setUploadProgress((prev) => ({ percentage: 60, message: "Embedding data..." }));
+            setUploadProgress((prev) => ({ percentage: 60, message: "Chunking data..." }));
             const chunks = chunkText(res.text, 500);
+
+            setUploadProgress((prev) => ({ percentage: 64, message: "Embedding data..." }));
             const allEmbeddings = await getBatchEmbeddings(chunks);
+
+            setUploadProgress((prev) => ({ percentage: 72, message: "Resetting tables.." }));
             await deleteEmbeddingsTableData(db);
             await deleteConversationTableData(db);
+            await deleteCheatSheetTableData(db);
 
             for (let i = 0; i < chunks.length; i++) {
                 const embeddingArr = allEmbeddings[i];
