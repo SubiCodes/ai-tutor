@@ -118,7 +118,7 @@ const ChatWithTutor = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Button className='bg-transparent items-center justify-center' onPress={() => setShowDeleteConversationModal(true)}>
+        <Button className='bg-transparent items-center justify-center active:bg-transparent' onPress={() => setShowDeleteConversationModal(true)}>
           <TrashIcon size={20} color={'red'} />
         </Button>
       ),
