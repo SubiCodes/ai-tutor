@@ -25,6 +25,7 @@ const suggestions = [
 
 const ChatWithTutor = () => {
   const navigation = useNavigation();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [conversation, setConversation] = useState<Content[]>([]);
@@ -102,6 +103,13 @@ const ChatWithTutor = () => {
     }
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 300); // Increase delay
+
+    return () => clearTimeout(timer);
+  }, [conversation, isTutorThinking]); // Watch entire conversation array, not just length
 
   useEffect(() => {
     (async () => {
@@ -134,7 +142,10 @@ const ChatWithTutor = () => {
         style={{ flex: 1, width: '100%' }}
         keyboardVerticalOffset={100} // Adjust this value based on your header/navigation height
       >
-        <ScrollView className="min-w-full flex-1" contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView
+          className="min-w-full flex-1"
+          ref={scrollViewRef}
+        >
           {conversation.length === 0 ? (
             <>
               <View className="items-center mb-8">
