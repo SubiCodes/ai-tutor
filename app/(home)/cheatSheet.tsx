@@ -6,7 +6,7 @@ import { getDb } from '@/db/db'
 import * as SQLite from "expo-sqlite";
 import Markdown from 'react-native-markdown-display'
 import { useFocusEffect } from 'expo-router'
-import { getCheatSheet, postToCheatSheet } from '@/db/cheatSheetFunctions'
+import { deleteCheatSheetTableData, getCheatSheet, postToCheatSheet } from '@/db/cheatSheetFunctions'
 
 const CheatSheet = () => {
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
@@ -28,6 +28,7 @@ const CheatSheet = () => {
 
     const generateCheatSheet = async () => {
         if (!db) return;
+        await deleteCheatSheetTableData(db)
         const lecture = await createStudyNotes(db);
         setLecture(lecture);
         await postToCheatSheet(db, lecture)
