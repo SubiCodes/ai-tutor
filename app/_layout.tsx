@@ -56,8 +56,9 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <KeyboardProvider>
-      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+
+    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+      <KeyboardProvider>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <AlertPersonalization open={openPersonalizationAlert} onOpenChange={setOpenPersonalizationAlert} />
         <Drawer screenOptions={{
@@ -80,7 +81,7 @@ export default function RootLayout() {
           }} />
         </Drawer>
         <PortalHost />
-      </ThemeProvider>
-    </KeyboardProvider>
+      </KeyboardProvider>
+    </ThemeProvider>
   );
 }
