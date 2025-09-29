@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Content, getAIResponse } from '@/util/conversationalAI';
 import * as SQLite from "expo-sqlite";
@@ -7,11 +7,12 @@ import { getDb } from '@/db/db';
 import { getAllConversation, postToConversation } from '@/db/conversationFunctions';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle } from 'lucide-react-native';
+import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle, MoreVertical } from 'lucide-react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useNavigation } from 'expo-router';
 import Markdown from 'react-native-markdown-display';
+import { useColorScheme } from 'nativewind';
 
 const suggestions = [
   { icon: BookOpen, text: "Explain a concept from my lecture", color: "text-blue-500" },
@@ -22,6 +23,10 @@ const suggestions = [
 
 
 const ChatWithTutor = () => {
+
+  const navigation = useNavigation();
+  const { colorScheme } = useColorScheme();
+  const iconColor = colorScheme === "dark" ? "#fff" : "#000";
 
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [conversation, setConversation] = useState<Content[]>([]);
@@ -83,6 +88,21 @@ const ChatWithTutor = () => {
     fetchRecentConversations();
   }, [db]));
 
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            console.log("Three-dot menu pressed");
+          }}
+          style={{ marginRight: 16 }}
+        >
+          <MoreVertical size={24} color={iconColor} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, iconColor]);
 
   return (
     <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 py-4 gap-2" edges={["left", "right", "bottom"]}>
