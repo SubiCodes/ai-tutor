@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { extractTextFromFile } from '@/util/textExtractionFromFiles';
 import { getBatchEmbeddings } from '@/util/embedUploadedText';
 import { chunkText } from '@/util/chunkText';
-import { postEmbeddedChunks, deleteEmbeddingsTableData, embeddingToUint8Array, getAllEmbeddings } from '@/db/storingEmbeddingChunksFunctions';
+import { postEmbeddedChunks, deleteEmbeddingsTableData, embeddingToUint8Array, getAllEmbeddings } from '@/db/embeddedChunksFunctions'
 import { getDb } from '@/db/db';
 import AlertError from '@/components/AlertError';
 

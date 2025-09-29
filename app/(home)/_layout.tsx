@@ -26,6 +26,13 @@ export default function AuthLayout() {
             headerLeft: () => <DrawerToggle />,
           }}
         />
+        <Stack.Screen
+          name="chatWithTutor"
+          options={{
+            title: 'Chat with Tutor',
+            headerShown: true,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
