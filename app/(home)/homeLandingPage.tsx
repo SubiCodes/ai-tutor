@@ -98,10 +98,6 @@ const HomeLandingPage = () => {
         }
     };
 
-    const test = async () => {
-        getAllEmbeddings(db!);
-    }
-
     const clearFile = async () => {
         try {
             await AsyncStorage.removeItem("tutorKnowledge");
@@ -138,7 +134,6 @@ const HomeLandingPage = () => {
             <AlertLoadingWithState open={isUploading} onOpenChange={() => { }} currentState={uploadProgress.message} activity="Processing File" progress={uploadProgress.percentage} />
 
             <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
-                <Button onPress={() => test()}><Text>TEST</Text></Button>
                 {/* UPLOAD FILE */}
                 <View className="flex flex-col w-full gap-4 mb-6">
                     <Text className="text-xl font-bold text-foreground">
