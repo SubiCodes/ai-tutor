@@ -8,5 +8,10 @@ export const postToConversation = async (
         [param.role, param.message]
     );
 
-    console.log(`✅ Inserted rowId: ${result.lastInsertRowId}`);
+    console.log(`✅ Inserted rowId: ${result}`);
 };
+
+export const getAllConversation = async (db: SQLite.SQLiteDatabase) => {
+    const allRows = await db.getAllAsync('SELECT * FROM conversation');
+    return allRows as { id: number; role: string; message: string }[];
+}
