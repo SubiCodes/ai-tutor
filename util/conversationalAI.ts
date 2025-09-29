@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as SQLite from "expo-sqlite";
 import { embedUserQuery } from "./embedUserQuery";
-import { getDb } from "@/db/db";
 import { getAllEmbeddings } from "@/db/embeddedChunksFunctions";
 
 type Content = {

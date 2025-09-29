@@ -1,14 +1,26 @@
 import { View, Text } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { getAIResponse } from '@/util/conversationalAI';
+import * as SQLite from "expo-sqlite";
+import { getDb } from '@/db/db';
 
 const ChatWithTutor = () => {
 
+  const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+
   const test = async (query: string) => {
-    const reply = await getAIResponse([], query);
+    if (!db) return;
+    const reply = await getAIResponse([], query, db);
     console.log(reply);
   }
+
+  useEffect(() => {
+    (async () => {
+      const database = await getDb();
+      setDb(database);
+    })();
+  }, []);
 
   return (
     <View>
