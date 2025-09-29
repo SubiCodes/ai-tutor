@@ -21,6 +21,13 @@ export const getDb = async (): Promise<SQLite.SQLiteDatabase> => {
         message TEXT NOT NULL
       );
     `);
+    await db.execAsync(`
+      PRAGMA journal_mode = WAL;
+      CREATE TABLE IF NOT EXISTS cheatSheet (
+        id INTEGER PRIMARY KEY NOT NULL,
+        lecture TEXT NOT NULL
+      );
+    `);
   }
   return db;
 };
