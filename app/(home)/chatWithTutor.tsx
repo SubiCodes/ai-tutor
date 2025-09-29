@@ -14,6 +14,7 @@ import { useFocusEffect, useNavigation } from 'expo-router';
 import Markdown from 'react-native-markdown-display';
 import { useColorScheme } from 'nativewind';
 import AlertDelete from '@/components/AlertDelete';
+import AlertLoadingWithState from '@/components/AlertLoadingWithState';
 
 const suggestions = [
   { icon: BookOpen, text: "Explain a concept from my lecture", color: "text-blue-500" },
@@ -41,7 +42,10 @@ const ChatWithTutor = () => {
   const [conversation, setConversation] = useState<Content[]>([]);
   const [prompt, setPrompt] = useState<string>('');
   const conversationRef = useRef<Content[]>(conversation);
+
   const [showDeleteConversationModal, setShowDeleteConversationModal] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [deleteProgress, setDeleteProgress] = useState<{ percentage: number, message: string }>({ percentage: 0, message: "" });
 
   const fetchRecentConversations = async () => {
     if (!db) return;
@@ -60,8 +64,23 @@ const ChatWithTutor = () => {
   };
 
   const deleteConversation = async () => {
-    if (!db) return;
-    await deleteConversationTableData(db);
+    setShowDeleteConversationModal(false);
+    setIsDeleting(true);
+    setDeleteProgress({ percentage: 40, message: "Preparing.." })
+    try {
+      if (!db) return;
+      setDeleteProgress({ percentage: 80, message: "Deleting.." });
+      await deleteConversationTableData(db);
+      setDeleteProgress({ percentage: 100, message: "Complete.." });
+      conversationRef.current = [];
+      setConversation(conversationRef.current);
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsDeleting(false);
+      setDeleteProgress({ percentage: 0, message: "" });
+    }
+
   }
 
   const askAi = async (query: string) => {
@@ -108,7 +127,7 @@ const ChatWithTutor = () => {
     navigation.setOptions({
       headerRight: () => (
         <Button className='bg-transparent items-center justify-center' onPress={() => setShowDeleteConversationModal(true)}>
-          <TrashIcon size={20} color={'red'}/>
+          <TrashIcon size={20} color={'red'} />
         </Button>
       ),
     });
@@ -116,7 +135,8 @@ const ChatWithTutor = () => {
 
   return (
     <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 py-4 gap-2" edges={["left", "right", "bottom"]}>
-      <AlertDelete open={showDeleteConversationModal} onOpenChange={() => {}} onClose={() => setShowDeleteConversationModal(false)} onDelete={() => deleteConversation()} title='Are you sure?' description={`This with delete all of your current messages and AI tutor's responses.`} continueButtonText='Delete'/>
+      <AlertDelete open={showDeleteConversationModal} onOpenChange={() => { }} onClose={() => setShowDeleteConversationModal(false)} onDelete={() => deleteConversation()} title='Are you sure?' description={`This with delete all of your current messages and AI tutor's responses.`} continueButtonText='Delete' />
+      <AlertLoadingWithState open={isDeleting} onOpenChange={() => { }} currentState={deleteProgress.message} activity="Processing File" progress={deleteProgress.percentage} />
       <KeyboardAvoidingView
         behavior="padding"
         style={{ flex: 1, width: '100%' }}
