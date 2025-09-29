@@ -158,6 +158,7 @@ const ChatWithTutor = () => {
                     <TouchableOpacity
                       key={index}
                       className="flex-row items-center p-4 bg-gray-50 rounded-2xl border border-gray-100"
+                      onPress={() => askAi(suggestion.text)}
                     >
                       <View className="w-10 h-10 rounded-full bg-white items-center justify-center mr-3 shadow-sm">
                         <Icon className={suggestion.color} size={20} strokeWidth={2} />

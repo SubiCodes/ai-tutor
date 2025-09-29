@@ -39,10 +39,13 @@ async function getTopContext(queryEmbedding: number[], limit = 3, db: SQLite.SQL
     return scored.slice(0, limit).map(r => r.text).join("\n\n");
 }
 
-export const getAIResponse = async ( conversationHistory: Content[], newPrompt: string, db: SQLite.SQLiteDatabase): Promise<string> => {
+export const getAIResponse = async (conversationHistory: Content[], newPrompt: string, db: SQLite.SQLiteDatabase): Promise<string> => {
     const queryEmbedding = await embedUserQuery(newPrompt);
     const context = await getTopContext(queryEmbedding, 3, db);
+
     const lecturePosted = await AsyncStorage.getItem("tutorKnowledge");
+    const allEmbeddings = await getAllEmbeddings(db);
+    const fullLectureText = allEmbeddings.map(e => e.text).join("\n\n");
 
     const apiKey = process.env.EXPO_PUBLIC_API_GEMINI;
     const modelName = "gemini-2.5-flash";
@@ -59,14 +62,14 @@ export const getAIResponse = async ( conversationHistory: Content[], newPrompt: 
             parts: [
                 {
                     text: `
-                        You are an AI Tutor tasked with teaching about the relevant topic posted by the user.  
-                        The lecture posted by the user is as follows:  
+                    You are an AI Tutor tasked with teaching about the relevant topic posted by the user.  
+                    The lecture content is as follows:  
 
-                        ${lecturePosted || "No lecture found."}
+                    ${fullLectureText || "No lecture found."}
 
-                        Answer the user's questions based on this lecture **and the retrieved context**.  
-                        If the question is not related, politely say you can only answer lecture-related queries.
-          `,
+                    Answer the user's questions based on this lecture **and the retrieved context**.  
+                    If the question is not related, politely say you can only answer lecture-related queries.
+                    `,
                 },
                 { text: `Retrieved context:\n${context}` },
             ],
