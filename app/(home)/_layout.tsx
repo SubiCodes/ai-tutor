@@ -33,6 +33,13 @@ export default function AuthLayout() {
             headerShown: true,
           }}
         />
+        <Stack.Screen
+          name="cheatSheet"
+          options={{
+            title: 'Cheat Sheet',
+            headerShown: true,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

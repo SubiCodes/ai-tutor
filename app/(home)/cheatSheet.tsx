@@ -24,7 +24,7 @@ const CheatSheet = () => {
     }, []);
     return (
         <View>
-            <Button>
+            <Button onPress={() => generateCheatSheet()}>
                 <Text>CheatSheet</Text>
             </Button>
             <Markdown>{lecture}</Markdown>

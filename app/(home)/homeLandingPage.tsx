@@ -207,7 +207,7 @@ const HomeLandingPage = () => {
                         Create notes from file
                     </Text>
                     <View className="w-full flex-row gap-2 items-center justify-center">
-                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => Alert.alert("Feature coming soon!")}>
+                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => openPage('/(home)/cheatSheet')}>
                             <LinearGradient
                                 colors={["#3B82F6", "#06B6D4"]} // blue → cyan
                                 start={{ x: 0, y: 0 }}
