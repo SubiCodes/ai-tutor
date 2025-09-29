@@ -134,7 +134,7 @@ const ChatWithTutor = () => {
   }, [navigation]);
 
   return (
-    <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 py-4 gap-2" edges={["left", "right", "bottom"]}>
+    <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 pb-4 pt-0 gap-2" edges={["left", "right", "bottom"]}>
       <AlertDelete open={showDeleteConversationModal} onOpenChange={() => { }} onClose={() => setShowDeleteConversationModal(false)} onDelete={() => deleteConversation()} title='Are you sure?' description={`This with delete all of your current messages and AI tutor's responses.`} continueButtonText='Delete' />
       <AlertLoadingWithState open={isDeleting} onOpenChange={() => { }} currentState={deleteProgress.message} activity="Processing File" progress={deleteProgress.percentage} />
       <KeyboardAvoidingView
