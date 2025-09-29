@@ -4,15 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Content, getAIResponse } from '@/util/conversationalAI';
 import * as SQLite from "expo-sqlite";
 import { getDb } from '@/db/db';
-import { getAllConversation, postToConversation } from '@/db/conversationFunctions';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { deleteConversationTableData, getAllConversation, postToConversation } from '@/db/conversationFunctions';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle, MoreVertical } from 'lucide-react-native';
+import { MessageCircle, BookOpen, HelpCircle, Lightbulb, CheckCircle, TrashIcon } from 'lucide-react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFocusEffect, useNavigation } from 'expo-router';
 import Markdown from 'react-native-markdown-display';
 import { useColorScheme } from 'nativewind';
+import AlertDelete from '@/components/AlertDelete';
 
 const suggestions = [
   { icon: BookOpen, text: "Explain a concept from my lecture", color: "text-blue-500" },
@@ -24,14 +25,23 @@ const suggestions = [
 
 const ChatWithTutor = () => {
 
-  const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
   const iconColor = colorScheme === "dark" ? "#fff" : "#000";
+  const navigation = useNavigation();
+
+  const insets = useSafeAreaInsets();
+  const contentInsets = {
+    top: insets.top,
+    bottom: insets.bottom,
+    left: 4,
+    right: 4,
+  };
 
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [conversation, setConversation] = useState<Content[]>([]);
   const [prompt, setPrompt] = useState<string>('');
   const conversationRef = useRef<Content[]>(conversation);
+  const [showDeleteConversationModal, setShowDeleteConversationModal] = useState<boolean>(false);
 
   const fetchRecentConversations = async () => {
     if (!db) return;
@@ -48,6 +58,11 @@ const ChatWithTutor = () => {
     conversationRef.current = mapped;
     setConversation(conversationRef.current);
   };
+
+  const deleteConversation = async () => {
+    if (!db) return;
+    await deleteConversationTableData(db);
+  }
 
   const askAi = async (query: string) => {
     if (!db) return;
@@ -92,20 +107,16 @@ const ChatWithTutor = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => {
-            console.log("Three-dot menu pressed");
-          }}
-          style={{ marginRight: 16 }}
-        >
-          <MoreVertical size={24} color={iconColor} />
-        </TouchableOpacity>
+        <Button className='bg-transparent items-center justify-center' onPress={() => setShowDeleteConversationModal(true)}>
+          <TrashIcon size={20} color={'red'}/>
+        </Button>
       ),
     });
-  }, [navigation, iconColor]);
+  }, [navigation]);
 
   return (
     <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 py-4 gap-2" edges={["left", "right", "bottom"]}>
+      <AlertDelete open={showDeleteConversationModal} onOpenChange={() => {}} onClose={() => setShowDeleteConversationModal(false)} onDelete={() => deleteConversation()} title='Are you sure?' description={`This with delete all of your current messages and AI tutor's responses.`} continueButtonText='Delete'/>
       <KeyboardAvoidingView
         behavior="padding"
         style={{ flex: 1, width: '100%' }}

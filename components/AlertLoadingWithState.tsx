@@ -24,7 +24,7 @@ interface AlertOverlayProps {
 
 const AlertLoadingWithState = ({ open, onOpenChange, currentState, activity, progress }: AlertOverlayProps) => {
     return (
-        <AlertDialog open={open} onOpenChange={onOpenChange}>
+        <AlertDialog open={open} onOpenChange={() => {  }} >
             <AlertDialogContent className='w-[90%] min-w-[90%]'>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{activity}</AlertDialogTitle>
