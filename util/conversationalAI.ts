@@ -4,7 +4,7 @@ import * as SQLite from "expo-sqlite";
 import { embedUserQuery } from "./embedUserQuery";
 import { getAllEmbeddings } from "@/db/embeddedChunksFunctions";
 
-type Content = {
+export type Content = {
     role: "user" | "model";
     parts: { text: string }[];
 };

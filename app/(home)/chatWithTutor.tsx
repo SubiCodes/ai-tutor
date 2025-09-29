@@ -1,18 +1,35 @@
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { getAIResponse } from '@/util/conversationalAI';
+import { Content, getAIResponse } from '@/util/conversationalAI';
 import * as SQLite from "expo-sqlite";
 import { getDb } from '@/db/db';
+import { getAllConversation } from '@/db/conversationFunctions';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ChatWithTutor = () => {
 
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+  const [conversation, setConversation] = useState<Content[]>([]);
 
-  const test = async (query: string) => {
+  const fetchRecentConversations = async () => {
     if (!db) return;
-    const reply = await getAIResponse([], query, db);
-    console.log(reply);
+
+    const allRows = await getAllConversation(db);
+    console.log("All conversation rows:", allRows);
+
+    const mapped: Content[] = allRows.map((r) => ({
+      role: r.role === "model" ? "model" : "user",
+      parts: [{ text: r.message }],
+    }));
+
+    console.log("MAPPED Conversation:", mapped);
+    setConversation(mapped);
+  };
+
+  const askAi = async (query: string) => {
+    if (!db) return;
+    const reply = await getAIResponse(conversation, query, db);
   }
 
   useEffect(() => {
@@ -20,12 +37,16 @@ const ChatWithTutor = () => {
       const database = await getDb();
       setDb(database);
     })();
-  }, []);
+    fetchRecentConversations();
+  }, [db]);
+
 
   return (
-    <View>
-      <Button onPress={() => test("What is it that you do?")}><Text>TEST</Text></Button>
-    </View>
+    <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 pt-4" edges={["left", "right", "bottom"]}>
+      <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
+        
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
