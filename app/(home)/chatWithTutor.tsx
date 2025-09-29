@@ -25,23 +25,13 @@ const suggestions = [
 
 
 const ChatWithTutor = () => {
-
-  const { colorScheme } = useColorScheme();
-  const iconColor = colorScheme === "dark" ? "#fff" : "#000";
   const navigation = useNavigation();
-
-  const insets = useSafeAreaInsets();
-  const contentInsets = {
-    top: insets.top,
-    bottom: insets.bottom,
-    left: 4,
-    right: 4,
-  };
 
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const [conversation, setConversation] = useState<Content[]>([]);
   const [prompt, setPrompt] = useState<string>('');
   const conversationRef = useRef<Content[]>(conversation);
+  const [isTutorThinking, setIsTutorThinking] = useState<boolean>(false);
 
   const [showDeleteConversationModal, setShowDeleteConversationModal] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
@@ -84,30 +74,33 @@ const ChatWithTutor = () => {
   }
 
   const askAi = async (query: string) => {
-    if (!db) return;
-    if (!query.trim()) return;
+    setIsTutorThinking(true);
+    try {
+      if (!db) return;
+      if (!query.trim()) return;
+      setPrompt('');
+      const userMessage: Content = { role: "user", parts: [{ text: query }] };
+      conversationRef.current = [...conversationRef.current, userMessage];
+      setConversation([...conversationRef.current]);
 
-    // Empty the query input box
-    setPrompt('');
+      // --- Save user query to DB
+      await postToConversation(db, { role: 'user', message: query });
 
-    // --- Update conversation immediately with user query
-    const userMessage: Content = { role: "user", parts: [{ text: query }] };
-    conversationRef.current = [...conversationRef.current, userMessage];
-    setConversation([...conversationRef.current]);
+      // --- 2Get AI response
+      const responseText = await getAIResponse(conversationRef.current, query, db);
+      const aiMessage: Content = { role: "model", parts: [{ text: responseText }] };
 
-    // --- Save user query to DB
-    await postToConversation(db, { role: 'user', message: query });
+      // --- Update conversation immediately with AI response
+      conversationRef.current = [...conversationRef.current, aiMessage];
+      setConversation([...conversationRef.current]);
 
-    // --- 2Get AI response
-    const responseText = await getAIResponse(conversationRef.current, query, db);
-    const aiMessage: Content = { role: "model", parts: [{ text: responseText }] };
+      // --- Save AI response to DB
+      await postToConversation(db, { role: 'model', message: responseText });
+    } catch (error) {
 
-    // --- Update conversation immediately with AI response
-    conversationRef.current = [...conversationRef.current, aiMessage];
-    setConversation([...conversationRef.current]);
-
-    // --- Save AI response to DB
-    await postToConversation(db, { role: 'model', message: responseText });
+    } finally {
+      setIsTutorThinking(false);
+    }
   };
 
 
@@ -202,10 +195,18 @@ const ChatWithTutor = () => {
                     ) : (
                       <Markdown>{message.parts[0]?.text}</Markdown>
                     )}
-
                   </View>
                 </View>
               ))}
+              {isTutorThinking && (
+                <View className="mb-4 flex-row justify-start">
+                  <View className="max-w-[80%] px-4 py-3 rounded-2xl bg-gray-100 rounded-bl-sm">
+                    <Text className="text-base text-gray-500 italic">
+                      Tutor is thinking…
+                    </Text>
+                  </View>
+                </View>
+              )}
             </>
           )}
         </ScrollView>
