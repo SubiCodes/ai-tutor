@@ -12,7 +12,6 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFocusEffect, useNavigation } from 'expo-router';
 import Markdown from 'react-native-markdown-display';
-import { useColorScheme } from 'nativewind';
 import AlertDelete from '@/components/AlertDelete';
 import AlertLoadingWithState from '@/components/AlertLoadingWithState';
 
