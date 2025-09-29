@@ -13,6 +13,14 @@ export const getDb = async (): Promise<SQLite.SQLiteDatabase> => {
         embedding BLOB NOT NULL
       );
     `);
+    await db.execAsync(`
+      PRAGMA journal_mode = WAL;
+      CREATE TABLE IF NOT EXISTS conversation (
+        id INTEGER PRIMARY KEY NOT NULL,
+        role TEXT NOT NULL,
+        message TEXT NOT NULL
+      );
+    `);
   }
   return db;
 };
