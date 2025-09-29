@@ -1,4 +1,5 @@
 import { getDb } from "@/db/db";
+import { getAllEmbeddings } from "@/db/embeddedChunksFunctions";
 
 function cosineSim(a: number[], b: number[]): number {
   let dot = 0, normA = 0, normB = 0;
@@ -12,9 +13,7 @@ function cosineSim(a: number[], b: number[]): number {
 
 export async function retrieveRelevantChunks(queryEmbedding: number[], k = 3) {
   const db = await getDb();
-  const rows = await db.getAllAsync<{ text: string; embedding: Uint8Array }>(
-    "SELECT text, embedding FROM embeddings"
-  );
+  const rows = await getAllEmbeddings(db);
 
   const scored = rows.map(row => {
     const floatEmb = new Float32Array(row.embedding.buffer);

@@ -29,7 +29,5 @@ export const postEmbeddedChunks = async (
 
 export const getAllEmbeddings = async (db: SQLite.SQLiteDatabase) => {
     const allRows = await db.getAllAsync('SELECT * FROM embeddings');
-    for (const row of allRows) {
-        console.log(row);
-    }
+    return allRows as { id: number; text: string; embedding: Uint8Array }[];
 }

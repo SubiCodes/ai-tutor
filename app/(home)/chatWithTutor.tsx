@@ -6,16 +6,16 @@ import { embedUserQuery } from '@/util/embedUserQuery'
 
 const ChatWithTutor = () => {
 
-  const test = async () => {
-    const embeddedQuery = await embedUserQuery("Hello, is this working?");
+  const test = async (query: string) => {
+    const embeddedQuery = await embedUserQuery(query);
     console.log(embeddedQuery);
-    const reply = await getAIResponse([], "Hello, is this working?");
+    const reply = await getAIResponse([], query);
     console.log(reply);
   }
 
   return (
     <View>
-      <Button onPress={() => test()}><Text>TEST</Text></Button>
+      <Button onPress={() => test("Hello")}><Text>TEST</Text></Button>
     </View>
   )
 }
