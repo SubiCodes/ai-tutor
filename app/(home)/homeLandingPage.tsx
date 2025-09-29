@@ -1,7 +1,7 @@
 import { View, Text, Alert, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter, Route } from 'expo-router';
 import { LinearGradient } from "expo-linear-gradient";
 import * as DocumentPicker from "expo-document-picker";
 import * as SQLite from 'expo-sqlite';
@@ -18,15 +18,17 @@ import { chunkText } from '@/util/chunkText';
 import { postEmbeddedChunks, deleteEmbeddingsTableData, embeddingToUint8Array, getAllEmbeddings } from '@/db/embeddedChunksFunctions'
 import { getDb } from '@/db/db';
 import AlertError from '@/components/AlertError';
+import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 
 const HomeLandingPage = () => {
 
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+    const router = useRouter();
 
     const [file, setFile] = useState<any>(null);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [uploadProgress, setUploadProgress] = useState<{ percentage: number, message: string }>({ percentage: 0, message: "" });
-    const [errorUploading, setErrorUploading] = useState<{ error: boolean, message: string[]}>({ error: false, message: [] });
+    const [errorUploading, setErrorUploading] = useState<{ error: boolean, message: string[] }>({ error: false, message: [] });
 
     const getCurrentFile = async () => {
         const stored = await AsyncStorage.getItem("tutorKnowledge");
@@ -69,7 +71,7 @@ const HomeLandingPage = () => {
             const res = await extractTextFromFile(storedFile);
 
             if (!res.success || !res.text) {
-                setErrorUploading({ error: true, message: ["No information extracted from file" ]});
+                setErrorUploading({ error: true, message: ["No information extracted from file"] });
                 return
             };
 
@@ -119,6 +121,22 @@ const HomeLandingPage = () => {
         ]);
     };
 
+    const openPage = (page: Route) => {
+        const currentFile = AsyncStorage.getItem("tutorKnowledge");
+        if (!currentFile) {
+            ToastFunc.show({
+                type: 'warn',
+                text1: 'Upload a file first!',
+                text2: `No file is yet to be uploaded.`,
+                position: 'bottom',
+                visibilityTime: 4000,
+                autoHide: true,
+            })
+            return
+        }
+        router.push(page);
+    }
+
     useEffect(() => {
         (async () => {
             const database = await getDb();
@@ -136,7 +154,7 @@ const HomeLandingPage = () => {
     return (
         <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 pt-4" edges={["left", "right", "bottom"]}>
             <AlertLoadingWithState open={isUploading} onOpenChange={() => { }} currentState={uploadProgress.message} activity="Processing File" progress={uploadProgress.percentage} />
-            <AlertError visible={errorUploading.error} title='Unable to upload file' description='Something went wrong during the upload of your chosen file' errorList={errorUploading.message} onClose={() => setErrorUploading({error: false, message: []})}/>
+            <AlertError visible={errorUploading.error} title='Unable to upload file' description='Something went wrong during the upload of your chosen file' errorList={errorUploading.message} onClose={() => setErrorUploading({ error: false, message: [] })} />
             <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
                 {/* UPLOAD FILE */}
                 <View className="flex flex-col w-full gap-4 mb-6">
@@ -243,7 +261,7 @@ const HomeLandingPage = () => {
                         Talk to your tutor
                     </Text>
                     <View className="w-full flex-row gap-2 items-center justify-center">
-                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => Alert.alert("Feature coming soon!")}>
+                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => openPage('/(home)/chatWithTutor')}>
                             <LinearGradient
                                 colors={["#8B5CF6", "#EC4899"]} // violet-500 → pink-500
                                 start={{ x: 0, y: 0 }}
@@ -275,6 +293,7 @@ const HomeLandingPage = () => {
                 </View>
 
             </ScrollView>
+            <Toast />
         </SafeAreaView>
     )
 }
