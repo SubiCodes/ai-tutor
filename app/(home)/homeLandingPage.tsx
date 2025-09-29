@@ -17,6 +17,7 @@ import { getBatchEmbeddings } from '@/util/embedUploadedText';
 import { chunkText } from '@/util/chunkText';
 import { postEmbeddedChunks, deleteEmbeddingsTableData, embeddingToUint8Array, getAllEmbeddings } from '@/db/storingEmbeddingChunksFunctions';
 import { getDb } from '@/db/db';
+import AlertError from '@/components/AlertError';
 
 const HomeLandingPage = () => {
 
@@ -25,7 +26,7 @@ const HomeLandingPage = () => {
     const [file, setFile] = useState<any>(null);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [uploadProgress, setUploadProgress] = useState<{ percentage: number, message: string }>({ percentage: 0, message: "" });
-    const [errorUploading, setErrorUploading] = useState<{ error: boolean, message: string }>({ error: false, message: '' });
+    const [errorUploading, setErrorUploading] = useState<{ error: boolean, message: string[]}>({ error: false, message: [] });
 
     const getCurrentFile = async () => {
         const stored = await AsyncStorage.getItem("tutorKnowledge");
@@ -68,7 +69,7 @@ const HomeLandingPage = () => {
             const res = await extractTextFromFile(storedFile);
 
             if (!res.success || !res.text) {
-                setErrorUploading({ error: true, message: "No information extracted from file" });
+                setErrorUploading({ error: true, message: ["No information extracted from file" ]});
                 return
             };
 
@@ -94,7 +95,7 @@ const HomeLandingPage = () => {
 
         } catch (error) {
             console.error("Error picking or processing file:", error);
-            setErrorUploading({ error: true, message: "Error processing file. Please try again." });
+            setErrorUploading({ error: true, message: ["Error processing file. Please try again."] });
         } finally {
             setIsUploading(false);
             setUploadProgress((prev) => ({ percentage: 0, message: "" }));
@@ -135,7 +136,7 @@ const HomeLandingPage = () => {
     return (
         <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 pt-4" edges={["left", "right", "bottom"]}>
             <AlertLoadingWithState open={isUploading} onOpenChange={() => { }} currentState={uploadProgress.message} activity="Processing File" progress={uploadProgress.percentage} />
-
+            <AlertError visible={errorUploading.error} title='Unable to upload file' description='Something went wrong during the upload of your chosen file' errorList={errorUploading.message} onClose={() => setErrorUploading({error: false, message: []})}/>
             <ScrollView className="w-full" showsVerticalScrollIndicator={false}>
                 {/* UPLOAD FILE */}
                 <View className="flex flex-col w-full gap-4 mb-6">
