@@ -222,7 +222,7 @@ const ChatWithTutor = () => {
           )}
         </ScrollView>
         <View className="w-full pb-2 gap-2 bg-transparent flex-row">
-          <Input className='flex-1 border-gray-400' placeholder='Ask your tutor...' value={prompt} onChangeText={setPrompt} onSubmitEditing={() => askAi(prompt)} />
+          <Input className='flex-1 border-gray-400' placeholder='Ask your tutor...' value={prompt} onChangeText={setPrompt} onSubmitEditing={() => {if (!isTutorThinking && prompt.trim()) {askAi(prompt)}}} />
           <Button className={`bg-blue-500 w-auto items-center justify-center rounded-lg`} disabled={!prompt.trim()} onPress={() => askAi(prompt)}>
             <Text className='text-white'>
               <FontAwesome name="send-o" size={16} />
