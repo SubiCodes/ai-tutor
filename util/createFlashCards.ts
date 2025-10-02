@@ -134,6 +134,7 @@ export const createFlashCardsJSON = async (
       return [];
     }
 
+    console.log(parsed);
     return parsed;
   } catch (err: any) {
     console.error("Error creating flashcards:", err.response?.data || err.message || err);
