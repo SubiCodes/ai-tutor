@@ -33,18 +33,36 @@ const FlashCards = () => {
         setFileName(currentFile.name);
     };
 
+    const getCurrentFlashCards = async () => {
+        if (!db) {
+            console.log("NO DB");
+            return;
+        };
+
+        const rawFlashCards = await getFlashCard(db);
+        if (rawFlashCards && rawFlashCards.length > 0) {
+            const lectureText = rawFlashCards[0].questions; 
+
+            try {
+                const parsed: FlashCards = parseQuestionsToJson(lectureText);
+                setFlashCards(parsed); 
+            } catch (err) {
+                console.error("Failed to parse flashcards:", err);
+                setFlashCards(null);
+            }
+        } else {
+            setFlashCards(null);
+        }
+    };
+
     const generateFlashcards = async () => {
         if (!db) return
         setIsGeneratingFlashCards(true);
         try {
             const rawQuestions = await createFlashCardsString(db);
-            //console.log("Raw Questions: ",rawQuestions);
-
             await deleteFlashCardTableData(db);
             await postToFlashCard(db, rawQuestions);
-
             const parsedQuestions = await parseQuestionsToJson(rawQuestions);
-            //console.log("Parsed Questions: ",parsedQuestions);
             setFlashCards(parsedQuestions);
         } catch (error) {
             ToastFunc.show({
@@ -79,8 +97,9 @@ const FlashCards = () => {
     }, []);
 
     useFocusEffect(useCallback(() => {
-        getFileName()
-    }, []));
+        getFileName();
+        getCurrentFlashCards();
+    }, [db]));
 
 
     return (
@@ -136,7 +155,7 @@ const FlashCards = () => {
                         <View className='w-full'>
                             <Button className='w-full bg-blue-500 active:bg-blue-600' disabled={isGeneratingFlashCards}>
                                 {isGeneratingFlashCards ? (
-                                    <ActivityIndicator color={'white'} size={20}/>
+                                    <ActivityIndicator color={'white'} size={20} />
                                 ) : (
                                     <Text className='text-white font-bold'>Confirm</Text>
                                 )}

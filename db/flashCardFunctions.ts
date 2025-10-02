@@ -11,7 +11,7 @@ export const postToFlashCard = async (
 
 export const getFlashCard = async (db: SQLite.SQLiteDatabase) => {
     const allRows = await db.getAllAsync('SELECT * FROM flashCards');
-    return allRows as { id: number; lecture: string }[];
+    return allRows as { id: number; questions: string }[];
 }
 
 export const deleteFlashCardTableData = async (db: SQLite.SQLiteDatabase) => {
