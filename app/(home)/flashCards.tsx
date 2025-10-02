@@ -12,6 +12,7 @@ import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyn
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Toast, { Toast as ToastFunc } from 'toastify-react-native'
+import AlertDelete from '@/components/AlertDelete'
 
 export type FlashCard = {
     question: string;
@@ -27,6 +28,7 @@ const FlashCards = () => {
     const [fileName, setFileName] = useState<string>('Your lecture');
     const [amount, setAmount] = useState<string>('5 Cards');
     const [isGeneratingFlashCards, setIsGeneratingFlashCards] = useState<boolean>(false);
+    const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
     const getFileName = async () => {
         const currentFile = await getCurrentFileFromAsyncStorage();
@@ -41,11 +43,11 @@ const FlashCards = () => {
 
         const rawFlashCards = await getFlashCard(db);
         if (rawFlashCards && rawFlashCards.length > 0) {
-            const lectureText = rawFlashCards[0].questions; 
+            const lectureText = rawFlashCards[0].questions;
 
             try {
                 const parsed: FlashCards = parseQuestionsToJson(lectureText);
-                setFlashCards(parsed); 
+                setFlashCards(parsed);
             } catch (err) {
                 console.error("Failed to parse flashcards:", err);
                 setFlashCards(null);
@@ -77,8 +79,27 @@ const FlashCards = () => {
         } finally {
             setIsGeneratingFlashCards(false);
         }
-
     };
+
+    const deleteCurrentFlashCards = async () => {
+        if (!db) return
+        setOpenDeleteModal(true)
+        try {
+            await deleteFlashCardTableData(db);
+            setFlashCards(null);
+        } catch (error) {
+            ToastFunc.show({
+                type: 'error',
+                text1: 'Something went wrong',
+                text2: 'Unable to delete flash cards. Please try again.',
+                position: 'bottom',
+                visibilityTime: 4000,
+                autoHide: true,
+            });
+        } finally {
+            setOpenDeleteModal(false)
+        }
+    }
 
     function onLabelPress(amount: string) {
         return () => {
@@ -105,7 +126,7 @@ const FlashCards = () => {
 
     return (
         <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 pb-4 pt-0 gap-2" edges={["left", "right", "bottom"]}>
-
+            <AlertDelete open={openDeleteModal} onOpenChange={() => setOpenDeleteModal(false)} onClose={() => setOpenDeleteModal(false)} onDelete={deleteCurrentFlashCards} title='Create new flash cards' description='Note that the generation of new flash cards deletes the current flash cards displayed.' continueButtonText='Continue'/>
             {!flashCards ? (
                 <View className="w-full h-full items-center justify-center">
                     <View className="bg-background w-80 min-h-[96px] py-4 px-4 border rounded-xl border-gray-200 dark:border-gray-700 flex-col">
@@ -170,9 +191,9 @@ const FlashCards = () => {
                     <View className='flex-1'>
 
                     </View>
-                    <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' disabled={isGeneratingFlashCards}>
-                         <Text className='text-white font-bold'>Generate New Cards</Text>
-                         <Sparkles size={16} color={"white"} />
+                    <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' disabled={isGeneratingFlashCards} onPress={() => setOpenDeleteModal(true)}>
+                        <Text className='text-white font-bold'>Generate New Cards</Text>
+                        <Sparkles size={16} color={"white"} />
                     </Button>
 
                 </View>
