@@ -39,22 +39,32 @@ async function getTopContext(queryEmbedding: number[], limit = 3, db: SQLite.SQL
     return scored.slice(0, limit).map(r => r.text).join("\n\n");
 }
 
-export const getAIResponse = async (conversationHistory: Content[], newPrompt: string, db: SQLite.SQLiteDatabase): Promise<string> => {
+
+export const getAIResponse = async ( conversationHistory: Content[], newPrompt: string, db: SQLite.SQLiteDatabase ): Promise<string> => {
     const queryEmbedding = await embedUserQuery(newPrompt);
     const context = await getTopContext(queryEmbedding, 3, db);
 
-    const lecturePosted = await AsyncStorage.getItem("tutorKnowledge");
     const allEmbeddings = await getAllEmbeddings(db);
-    const fullLectureText = allEmbeddings.map(e => e.text).join("\n\n");
+    const fullLectureText = allEmbeddings.map((e) => e.text).join("\n\n");
 
-    const apiKey = process.env.EXPO_PUBLIC_API_GEMINI;
-    const modelName = "gemini-2.5-flash";
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+    const token = process.env.EXPO_PUBLIC_API_OPENAI;
+    const endpoint = "https://models.github.ai/inference";
+    const model = "openai/gpt-4.1-mini";
 
     const latestUserTurn: Content = {
         role: "user",
         parts: [{ text: newPrompt }],
     };
+
+    let lectureSection = "";
+    if (
+        !context || context.length < 200 || // context too short
+        /quiz|test|cover (everything|all)/i.test(newPrompt) // user explicitly asks for "whole lecture"
+    ) {
+        lectureSection = `The lecture content is as follows:\n\n${fullLectureText || "No lecture found."}`;
+    } else {
+        lectureSection = "Use the retrieved context to answer. Do not rely on missing parts of the lecture.";
+    }
 
     const fullContents: Content[] = [
         {
@@ -62,32 +72,53 @@ export const getAIResponse = async (conversationHistory: Content[], newPrompt: s
             parts: [
                 {
                     text: `
-                    You are an AI Tutor tasked with teaching about the relevant topic posted by the user.  
-                    The lecture content is as follows:  
+                    You are an AI Tutor tasked with teaching about the relevant topic posted by the user.
 
-                    ${fullLectureText || "No lecture found."}
+                    ${lectureSection}
 
-                    Answer the user's questions based on this lecture **and the retrieved context**.  
+                    Retrieved context:
+                    ${context || "No context found."}
+
+                    Answer the user's questions based on this material. 
                     If the question is not related, politely say you can only answer lecture-related queries.
-                    `,
+                    `.trim(),
                 },
-                { text: `Retrieved context:\n${context}` },
             ],
         },
         ...conversationHistory,
         latestUserTurn,
     ];
 
+    const messages = fullContents.map((c) => ({
+        role: c.role,
+        content: c.parts?.map((p) => p.text).join("\n\n") ?? "",
+    }));
+
     const requestBody = {
-        contents: fullContents,
-        generationConfig: {
-            thinkingConfig: { thinkingBudget: 0 },
-        },
+        model,
+        messages,
+        temperature: 0.7, // slightly lower for more focused answers
+        top_p: 1.0,
     };
 
     try {
-        const response = await axios.post(url, requestBody);
-        const generatedText = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+        const response = await axios.post(`${endpoint}/chat/completions`, requestBody, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        let generatedText: any = response.data?.choices?.[0]?.message?.content;
+
+        if (!generatedText && response.data?.choices?.[0]?.message?.content?.parts) {
+            const parts = response.data.choices[0].message.content.parts;
+            generatedText = Array.isArray(parts) ? parts.map((p: any) => p.text ?? p).join("") : String(parts);
+        }
+
+        if (typeof generatedText !== "string") {
+            generatedText = generatedText ? JSON.stringify(generatedText) : "";
+        }
 
         if (!generatedText) {
             console.warn("Response did not contain generated text:", response.data);
@@ -96,7 +127,7 @@ export const getAIResponse = async (conversationHistory: Content[], newPrompt: s
 
         return generatedText;
     } catch (error: any) {
-        console.error("Error generating content:", error.response?.data || error.message || error);
-        throw new Error("Failed to generate content from Gemini API.");
+        console.error("Error generating content (OpenAI endpoint):", error.response?.data || error.message || error);
+        throw new Error("Failed to generate content from OpenAI endpoint.");
     }
 };
