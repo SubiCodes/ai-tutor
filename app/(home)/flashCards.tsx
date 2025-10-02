@@ -10,6 +10,11 @@ const FlashCards = () => {
 
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
 
+    const generateFlashcards = async () => {
+        if(!db) return
+        createFlashCardsJSON(db);
+    }
+
     useEffect(() => {
         (async () => {
             const database = await getDb();
@@ -17,14 +22,10 @@ const FlashCards = () => {
         })();
     }, []);
 
-    useFocusEffect(useCallback(() => {
-        if(!db) return
-        createFlashCardsJSON(db);
-    }, []));
 
     return (
         <View>
-            <Button>
+            <Button onPress={() => generateFlashcards()}>
                 <Text>Create flash cards</Text>
             </Button>
         </View>

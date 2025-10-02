@@ -223,7 +223,7 @@ const HomeLandingPage = () => {
                                 <Text className="text-white text-xl font-bold">Cheat Sheet</Text>
                             </LinearGradient>
                         </TouchableOpacity>
-                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => Alert.alert("Feature coming soon!")}>
+                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => openPage('/(home)/flashCards')}>
                             <LinearGradient
                                 colors={["#3B82F6", "#06B6D4"]} // blue → cyan
                                 start={{ x: 0, y: 0 }}

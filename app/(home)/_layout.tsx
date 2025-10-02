@@ -40,6 +40,13 @@ export default function AuthLayout() {
             headerShown: true,
           }}
         />
+        <Stack.Screen
+          name="flashCards"
+          options={{
+            title: 'Flash Cards',
+            headerShown: true,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
