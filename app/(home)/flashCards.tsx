@@ -7,21 +7,8 @@ import { getDb } from '@/db/db'
 import * as SQLite from "expo-sqlite";
 import { deleteFlashCardTableData, getFlashCard, postToFlashCard } from '@/db/flashCardFunctions'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-import { Ionicons } from "@expo/vector-icons";
 import { Sparkles, ScrollText } from 'lucide-react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage'
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-    SelectGroup,
-    SelectLabel
-} from "@/components/ui/select"
 
 export type FlashCard = {
     question: string;
@@ -94,25 +81,6 @@ const FlashCards = () => {
 
                         <View className="w-full flex-col gap-2">
                             <Text className="text-foreground/80 font-normal text-base">Number of Cards</Text>
-                            <Select>
-                                <SelectTrigger className='w-full'>
-                                    <SelectValue placeholder='Amount of cards generated' />
-                                </SelectTrigger>
-                                <SelectContent className='w-full'>
-                                    <SelectGroup>
-                                        <SelectLabel>Fruits</SelectLabel>
-                                        <SelectItem label='5 Cards' value={'5'}>
-                                            5 Cards
-                                        </SelectItem>
-                                        <SelectItem label='10 Cards' value={'10'}>
-                                            10 Cards
-                                        </SelectItem>
-                                        <SelectItem label='15 Cards' value={'15'}>
-                                            15 Cards
-                                        </SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
                         </View>
                     </View>
                 </View>

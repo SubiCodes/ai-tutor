@@ -80,8 +80,8 @@ export default function RootLayout() {
             ),
           }} />
         </Drawer>
-        <PortalHost />
       </KeyboardProvider>
+      <PortalHost />
     </ThemeProvider>
   );
 }
