@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, ActivityIndicator } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useFocusEffect } from 'expo-router'
@@ -11,6 +11,7 @@ import { Sparkles, ScrollText } from 'lucide-react-native'
 import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage'
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 
 export type FlashCard = {
     question: string;
@@ -25,6 +26,7 @@ const FlashCards = () => {
     const [flashCards, setFlashCards] = useState<FlashCards | null>(null);
     const [fileName, setFileName] = useState<string>('Your lecture');
     const [amount, setAmount] = useState<string>('5 Cards');
+    const [isGeneratingFlashCards, setIsGeneratingFlashCards] = useState<boolean>(false);
 
     const getFileName = async () => {
         const currentFile = await getCurrentFileFromAsyncStorage();
@@ -33,15 +35,30 @@ const FlashCards = () => {
 
     const generateFlashcards = async () => {
         if (!db) return
-        const rawQuestions = await createFlashCardsString(db);
-        //console.log("Raw Questions: ",rawQuestions);
+        setIsGeneratingFlashCards(true);
+        try {
+            const rawQuestions = await createFlashCardsString(db);
+            //console.log("Raw Questions: ",rawQuestions);
 
-        await deleteFlashCardTableData(db);
-        await postToFlashCard(db, rawQuestions);
+            await deleteFlashCardTableData(db);
+            await postToFlashCard(db, rawQuestions);
 
-        const parsedQuestions = await parseQuestionsToJson(rawQuestions);
-        //console.log("Parsed Questions: ",parsedQuestions);
-        setFlashCards(parsedQuestions);
+            const parsedQuestions = await parseQuestionsToJson(rawQuestions);
+            //console.log("Parsed Questions: ",parsedQuestions);
+            setFlashCards(parsedQuestions);
+        } catch (error) {
+            ToastFunc.show({
+                type: 'error',
+                text1: 'Something went wrong',
+                text2: 'No flash card was generated. Please try again.',
+                position: 'bottom',
+                visibilityTime: 4000,
+                autoHide: true,
+            });
+        } finally {
+            setIsGeneratingFlashCards(false);
+        }
+
     };
 
     function onLabelPress(amount: string) {
@@ -92,7 +109,7 @@ const FlashCards = () => {
                             </View>
                         </View>
 
-                        <View className="w-full flex-col gap-4">
+                        <View className="w-full flex-col gap-4 mb-6">
                             <Text className="text-foreground/80 font-semibold text-base">Number of Cards</Text>
                             <RadioGroup value={amount} onValueChange={onValueChange} className='flex-row flex-wrap'>
                                 <View className="flex flex-row items-center gap-3">
@@ -114,6 +131,16 @@ const FlashCards = () => {
                                     </Label>
                                 </View>
                             </RadioGroup>
+                        </View>
+
+                        <View className='w-full'>
+                            <Button className='w-full bg-blue-500 active:bg-blue-600' disabled={isGeneratingFlashCards}>
+                                {isGeneratingFlashCards ? (
+                                    <ActivityIndicator color={'white'} size={20}/>
+                                ) : (
+                                    <Text className='text-white font-bold'>Confirm</Text>
+                                )}
+                            </Button>
                         </View>
                     </View>
                 </View>
