@@ -30,6 +30,13 @@ export const getDb = async (): Promise<SQLite.SQLiteDatabase> => {
         lecture TEXT NOT NULL
       );
     `);
+
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS flashCards (
+        id INTEGER PRIMARY KEY NOT NULL,
+        questions TEXT NOT NULL
+      );
+    `);
   }
   return db;
 };
