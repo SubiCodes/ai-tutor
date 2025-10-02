@@ -53,7 +53,7 @@ async function summarizeChunk(text: string): Promise<string> {
     }
 }
 
-export const createFlashCardsString= async ( db: SQLite.SQLiteDatabase ): Promise<string> => {
+export const createFlashCardsString= async ( db: SQLite.SQLiteDatabase, amount: number ): Promise<string> => {
     try {
         const allRows = await getAllEmbeddings(db);
         const fullLecture = allRows.map((r) => r.text).join("\n\n");
@@ -86,6 +86,8 @@ export const createFlashCardsString= async ( db: SQLite.SQLiteDatabase ): Promis
         ]
         - Keep questions clear and answers concise.
         - Return ONLY valid JSON. No explanations, no text outside the array.
+        - Only make ${amount} amount of questions.
+        - Do not add styling to the text.
     `.trim();
 
         const apiKey = process.env.EXPO_PUBLIC_API_OPENAI;

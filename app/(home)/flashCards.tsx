@@ -59,7 +59,8 @@ const FlashCards = () => {
         if (!db) return
         setIsGeneratingFlashCards(true);
         try {
-            const rawQuestions = await createFlashCardsString(db);
+            const amountOfCards = amount === '5 Cards' ? 5 : amount === '10 Cards' ? 10 : 15;
+            const rawQuestions = await createFlashCardsString(db, amountOfCards);
             await deleteFlashCardTableData(db);
             await postToFlashCard(db, rawQuestions);
             const parsedQuestions = await parseQuestionsToJson(rawQuestions);
