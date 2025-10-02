@@ -165,7 +165,17 @@ const FlashCards = () => {
                     </View>
                 </View>
             ) : (
-                <Text>Display Cards here</Text>
+                <View className='flex-1 w-full items-center justify-center'>
+                    {/* CARDS CONTAINER */}
+                    <View className='flex-1'>
+
+                    </View>
+                    <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' disabled={isGeneratingFlashCards}>
+                         <Text className='text-white font-bold'>Generate New Cards</Text>
+                         <Sparkles size={16} color={"white"} />
+                    </Button>
+
+                </View>
             )}
 
         </SafeAreaView>
