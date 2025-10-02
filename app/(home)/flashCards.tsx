@@ -13,6 +13,16 @@ import { Sparkles, ScrollText } from 'lucide-react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage'
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    SelectGroup,
+    SelectLabel
+} from "@/components/ui/select"
+
 export type FlashCard = {
     question: string;
     answer: string;
@@ -84,16 +94,25 @@ const FlashCards = () => {
 
                         <View className="w-full flex-col gap-2">
                             <Text className="text-foreground/80 font-normal text-base">Number of Cards</Text>
-                            <View className="w-full p-4 border rounded-lg border-gray-300 bg-gray-50 flex-row items-center justify-between">
-                                <ScrollText size={24} color={"#3B82F6"} />
-                                <Text
-                                    className="ml-2 text-gray-800 flex-1"
-                                    numberOfLines={1}
-                                    ellipsizeMode="middle"
-                                >
-                                    {fileName}
-                                </Text>
-                            </View>
+                            <Select>
+                                <SelectTrigger className='w-full'>
+                                    <SelectValue placeholder='Amount of cards generated' />
+                                </SelectTrigger>
+                                <SelectContent className='w-full'>
+                                    <SelectGroup>
+                                        <SelectLabel>Fruits</SelectLabel>
+                                        <SelectItem label='5 Cards' value={'5'}>
+                                            5 Cards
+                                        </SelectItem>
+                                        <SelectItem label='10 Cards' value={'10'}>
+                                            10 Cards
+                                        </SelectItem>
+                                        <SelectItem label='15 Cards' value={'15'}>
+                                            15 Cards
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
                         </View>
                     </View>
                 </View>
