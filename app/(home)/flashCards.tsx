@@ -9,6 +9,8 @@ import { deleteFlashCardTableData, getFlashCard, postToFlashCard } from '@/db/fl
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Sparkles, ScrollText } from 'lucide-react-native'
 import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage'
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 export type FlashCard = {
     question: string;
@@ -22,11 +24,12 @@ const FlashCards = () => {
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
     const [flashCards, setFlashCards] = useState<FlashCards | null>(null);
     const [fileName, setFileName] = useState<string>('Your lecture');
+    const [amount, setAmount] = useState<string>('5 Cards');
 
     const getFileName = async () => {
         const currentFile = await getCurrentFileFromAsyncStorage();
         setFileName(currentFile.name);
-    }
+    };
 
     const generateFlashcards = async () => {
         if (!db) return
@@ -39,6 +42,16 @@ const FlashCards = () => {
         const parsedQuestions = await parseQuestionsToJson(rawQuestions);
         //console.log("Parsed Questions: ",parsedQuestions);
         setFlashCards(parsedQuestions);
+    };
+
+    function onLabelPress(amount: string) {
+        return () => {
+            setAmount(amount);
+        };
+    }
+
+    function onValueChange(amount: string) {
+        setAmount(amount);
     }
 
     useEffect(() => {
@@ -65,8 +78,8 @@ const FlashCards = () => {
                             <Sparkles size={20} color={"#3B82F6"} />
                         </View>
 
-                        <View className="w-full flex-col gap-2 mb-2">
-                            <Text className="text-foreground/80 font-normal text-base">Lesson</Text>
+                        <View className="w-full flex-col gap-2 mb-4">
+                            <Text className="text-foreground/80 font-semibold text-base">Lesson</Text>
                             <View className="w-full p-4 border rounded-lg border-gray-300 bg-gray-50 flex-row items-center justify-between">
                                 <ScrollText size={24} color={"#3B82F6"} />
                                 <Text
@@ -79,8 +92,28 @@ const FlashCards = () => {
                             </View>
                         </View>
 
-                        <View className="w-full flex-col gap-2">
-                            <Text className="text-foreground/80 font-normal text-base">Number of Cards</Text>
+                        <View className="w-full flex-col gap-4">
+                            <Text className="text-foreground/80 font-semibold text-base">Number of Cards</Text>
+                            <RadioGroup value={amount} onValueChange={onValueChange} className='flex-row flex-wrap'>
+                                <View className="flex flex-row items-center gap-3">
+                                    <RadioGroupItem value="5 Cards" id="r1" />
+                                    <Label htmlFor="r1" onPress={onLabelPress('5 Cards')} className='font-normal'>
+                                        5 Cards
+                                    </Label>
+                                </View>
+                                <View className="flex flex-row items-center gap-3">
+                                    <RadioGroupItem value="10 Cards" id="r2" />
+                                    <Label htmlFor="r2" onPress={onLabelPress('10 Cards')} className='font-normal'>
+                                        10 Cards
+                                    </Label>
+                                </View>
+                                <View className="flex flex-row items-center gap-3">
+                                    <RadioGroupItem value="15 Cards" id="r3" />
+                                    <Label htmlFor="r3" onPress={onLabelPress('15 Cards')} className='font-normal'>
+                                        15 Cards
+                                    </Label>
+                                </View>
+                            </RadioGroup>
                         </View>
                     </View>
                 </View>
