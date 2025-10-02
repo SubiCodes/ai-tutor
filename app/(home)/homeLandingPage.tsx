@@ -21,6 +21,7 @@ import AlertError from '@/components/AlertError';
 import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 import { deleteConversationTableData } from '@/db/conversationFunctions';
 import { deleteCheatSheetTableData } from '@/db/cheatSheetFunctions';
+import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage';
 
 const HomeLandingPage = () => {
 
@@ -33,10 +34,8 @@ const HomeLandingPage = () => {
     const [errorUploading, setErrorUploading] = useState<{ error: boolean, message: string[] }>({ error: false, message: [] });
 
     const getCurrentFile = async () => {
-        const stored = await AsyncStorage.getItem("tutorKnowledge");
-        if (stored) {
-            setFile(JSON.parse(stored));
-        }
+        const currentFile = await getCurrentFileFromAsyncStorage();
+        setFile(currentFile);
     };
 
     const pickFile = async () => {

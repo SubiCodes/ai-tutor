@@ -6,10 +6,16 @@ import { createFlashCardsString, parseQuestionsToJson } from '@/util/createFlash
 import { getDb } from '@/db/db'
 import * as SQLite from "expo-sqlite";
 import { deleteFlashCardTableData, getFlashCard, postToFlashCard } from '@/db/flashCardFunctions'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+import { Ionicons } from "@expo/vector-icons";
+import { Sparkles, ScrollText } from 'lucide-react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage'
 
 export type FlashCard = {
-  question: string;
-  answer: string;
+    question: string;
+    answer: string;
 };
 
 export type FlashCards = FlashCard[];
@@ -17,7 +23,13 @@ export type FlashCards = FlashCard[];
 const FlashCards = () => {
 
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
-    const [flashCards, setFlashCards] = useState<FlashCards>();
+    const [flashCards, setFlashCards] = useState<FlashCards | null>(null);
+    const [fileName, setFileName] = useState<string>('Your lecture');
+
+    const getFileName = async () => {
+        const currentFile = await getCurrentFileFromAsyncStorage();
+        setFileName(currentFile.name);
+    }
 
     const generateFlashcards = async () => {
         if (!db) return
@@ -39,13 +51,43 @@ const FlashCards = () => {
         })();
     }, []);
 
+    useFocusEffect(useCallback(() => {
+        getFileName()
+    }, []));
+
 
     return (
-        <View>
-            <Button onPress={() => generateFlashcards()}>
-                <Text>Create flash cards</Text>
-            </Button>
-        </View>
+        <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 pb-4 pt-0 gap-2" edges={["left", "right", "bottom"]}>
+
+            {!flashCards ? (
+                <View className="w-full h-full items-center justify-center">
+                    <View className="bg-background w-80 min-h-[96px] py-2 px-4 border rounded-xl border-gray-200 dark:border-gray-700 flex-col">
+                        {/* HEADER */}
+                        <View className="w-full items-center justify-center mb-2 flex-row gap-2">
+                            <Text className="text-blue-500 font-bold text-xl">Generate Flash Cards</Text>
+                            <Sparkles size={20} color={"#3B82F6"} />
+                        </View>
+
+                        <View className="w-full flex-col gap-2">
+                            <Text className="text-foreground/80 font-normal text-base">Lesson</Text>
+                            <View className="w-full p-4 border rounded-lg border-gray-300 bg-gray-50 flex-row items-center justify-between">
+                                <ScrollText size={24} color={"#3B82F6"} />
+                                <Text
+                                    className="ml-2 text-gray-800 flex-1"
+                                    numberOfLines={1}
+                                    ellipsizeMode="middle"
+                                >
+                                    {fileName}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            ) : (
+                <Text>Display Cards here</Text>
+            )}
+
+        </SafeAreaView>
     )
 }
 
