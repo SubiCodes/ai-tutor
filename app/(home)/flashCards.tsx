@@ -61,15 +61,29 @@ const FlashCards = () => {
 
             {!flashCards ? (
                 <View className="w-full h-full items-center justify-center">
-                    <View className="bg-background w-80 min-h-[96px] py-2 px-4 border rounded-xl border-gray-200 dark:border-gray-700 flex-col">
+                    <View className="bg-background w-80 min-h-[96px] py-4 px-4 border rounded-xl border-gray-200 dark:border-gray-700 flex-col">
                         {/* HEADER */}
-                        <View className="w-full items-center justify-center mb-2 flex-row gap-2">
+                        <View className="w-full items-center justify-center mb-4 flex-row gap-2">
                             <Text className="text-blue-500 font-bold text-xl">Generate Flash Cards</Text>
                             <Sparkles size={20} color={"#3B82F6"} />
                         </View>
 
-                        <View className="w-full flex-col gap-2">
+                        <View className="w-full flex-col gap-2 mb-2">
                             <Text className="text-foreground/80 font-normal text-base">Lesson</Text>
+                            <View className="w-full p-4 border rounded-lg border-gray-300 bg-gray-50 flex-row items-center justify-between">
+                                <ScrollText size={24} color={"#3B82F6"} />
+                                <Text
+                                    className="ml-2 text-gray-800 flex-1"
+                                    numberOfLines={1}
+                                    ellipsizeMode="middle"
+                                >
+                                    {fileName}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View className="w-full flex-col gap-2">
+                            <Text className="text-foreground/80 font-normal text-base">Number of Cards</Text>
                             <View className="w-full p-4 border rounded-lg border-gray-300 bg-gray-50 flex-row items-center justify-between">
                                 <ScrollText size={24} color={"#3B82F6"} />
                                 <Text
