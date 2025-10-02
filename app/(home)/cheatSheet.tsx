@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { createStudyNotes } from '@/util/createNotes'
+import { createStudyNotesChunked } from '@/util/createNotes'
 import { getDb } from '@/db/db'
 import * as SQLite from "expo-sqlite";
 import Markdown from 'react-native-markdown-display'
@@ -20,7 +20,6 @@ const CheatSheet = () => {
         if (!db) return;
 
         const allRows = await getCheatSheet(db);
-        console.log("Cheat Sheet:", allRows);
 
         if (allRows.length > 0) {
             setLecture(allRows[0].lecture);
@@ -35,7 +34,7 @@ const CheatSheet = () => {
         try {
             if (!db) return;
             await deleteCheatSheetTableData(db)
-            const lecture = await createStudyNotes(db);
+            const lecture = await createStudyNotesChunked(db);
             setLecture(lecture);
             await postToCheatSheet(db, lecture)
         } catch (error) {
@@ -61,7 +60,6 @@ const CheatSheet = () => {
     useFocusEffect(
         useCallback(() => {
             if (db) {
-                console.log("IM CALLED")
                 fetchCheatSheet();
             }
         }, [db])
@@ -85,8 +83,10 @@ const CheatSheet = () => {
                     </TouchableOpacity>
                 </View>
             ) : (
-                <ScrollView className="min-w-full min-h-full flex-1">
-                    <Button onPress={() => { deleteLecture() }}><Text>DELETE</Text></Button>
+                <ScrollView
+                    className="flex-1 w-full min-h-full"
+                    contentContainerStyle={{ paddingBottom: 20, paddingTop: 20, paddingHorizontal: 16 }}
+                >
                     <Markdown>{lecture}</Markdown>
                 </ScrollView>
             )}
