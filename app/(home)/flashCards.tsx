@@ -11,8 +11,9 @@ import { Sparkles, ScrollText } from 'lucide-react-native'
 import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage'
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import Toast, { Toast as ToastFunc } from 'toastify-react-native'
-import AlertDelete from '@/components/AlertDelete'
+import Toast, { Toast as ToastFunc } from 'toastify-react-native';
+import AlertDelete from '@/components/AlertDelete';
+import Carousel from "pinar";
 
 export type FlashCard = {
     question: string;
@@ -20,6 +21,9 @@ export type FlashCard = {
 };
 
 export type FlashCards = FlashCard[];
+
+const colors = ['tomato', 'thistle', 'skyblue', 'teal'];
+
 
 const FlashCards = () => {
 
@@ -29,6 +33,13 @@ const FlashCards = () => {
     const [amount, setAmount] = useState<string>('5 Cards');
     const [isGeneratingFlashCards, setIsGeneratingFlashCards] = useState<boolean>(false);
     const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+
+    const renderItem = ({ item }: { item: any }) => (
+        <View className='bg-blue-500'>
+            <Text>{item.title}</Text>
+        </View>
+    );
+
 
     const getFileName = async () => {
         const currentFile = await getCurrentFileFromAsyncStorage();
@@ -66,6 +77,7 @@ const FlashCards = () => {
             await deleteFlashCardTableData(db);
             await postToFlashCard(db, rawQuestions);
             const parsedQuestions = await parseQuestionsToJson(rawQuestions);
+            console.log(parsedQuestions);
             setFlashCards(parsedQuestions);
         } catch (error) {
             ToastFunc.show({
@@ -82,7 +94,10 @@ const FlashCards = () => {
     };
 
     const deleteCurrentFlashCards = async () => {
-        if (!db) return
+        if (!db) {
+            console.log("NO DB");
+            return;
+        };
         setOpenDeleteModal(true)
         try {
             await deleteFlashCardTableData(db);
@@ -188,9 +203,17 @@ const FlashCards = () => {
             ) : (
                 <View className='flex-1 w-full items-center justify-center'>
                     {/* CARDS CONTAINER */}
-                    <View className='flex-1'>
-
-                    </View>
+                    <Carousel showsControls={false}>
+                        <View className='flex-1'>
+                            <Text>1</Text>
+                        </View>
+                        <View className='flex-1'>
+                            <Text >2</Text>
+                        </View>
+                        <View className='flex-1'>
+                            <Text>3</Text>
+                        </View>
+                    </Carousel>
                     <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' disabled={isGeneratingFlashCards} onPress={() => setOpenDeleteModal(true)}>
                         <Text className='text-white font-bold'>Generate New Cards</Text>
                         <Sparkles size={16} color={"white"} />
@@ -198,10 +221,12 @@ const FlashCards = () => {
 
                 </View>
             )}
-
+            <Toast />
         </SafeAreaView>
     )
-}
+};
+
+
 
 
 export default FlashCards
