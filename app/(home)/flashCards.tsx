@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from 'react-native'
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useFocusEffect } from 'expo-router'
@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 import AlertDelete from '@/components/AlertDelete'
+import Swiper from 'react-native-swiper'
 
 export type FlashCard = {
     question: string;
@@ -126,7 +127,7 @@ const FlashCards = () => {
 
     return (
         <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 pb-4 pt-0 gap-2" edges={["left", "right", "bottom"]}>
-            <AlertDelete open={openDeleteModal} onOpenChange={() => setOpenDeleteModal(false)} onClose={() => setOpenDeleteModal(false)} onDelete={deleteCurrentFlashCards} title='Create new flash cards' description='Note that the generation of new flash cards deletes the current flash cards displayed.' continueButtonText='Continue'/>
+            <AlertDelete open={openDeleteModal} onOpenChange={() => setOpenDeleteModal(false)} onClose={() => setOpenDeleteModal(false)} onDelete={deleteCurrentFlashCards} title='Create new flash cards' description='Note that the generation of new flash cards deletes the current flash cards displayed.' continueButtonText='Continue' />
             {!flashCards ? (
                 <View className="w-full h-full items-center justify-center">
                     <View className="bg-background w-80 min-h-[96px] py-4 px-4 border rounded-xl border-gray-200 dark:border-gray-700 flex-col">
@@ -175,7 +176,7 @@ const FlashCards = () => {
                         </View>
 
                         <View className='w-full'>
-                            <Button className='w-full bg-blue-500 active:bg-blue-600' disabled={isGeneratingFlashCards}>
+                            <Button className='w-full bg-blue-500 active:bg-blue-600' disabled={isGeneratingFlashCards} onPress={() => generateFlashcards()}>
                                 {isGeneratingFlashCards ? (
                                     <ActivityIndicator color={'white'} size={20} />
                                 ) : (
@@ -189,7 +190,17 @@ const FlashCards = () => {
                 <View className='flex-1 w-full items-center justify-center'>
                     {/* CARDS CONTAINER */}
                     <View className='flex-1'>
-
+                        <Swiper style={styles.wrapper} showsButtons={true}>
+                            <View style={styles.slide1}>
+                                <Text style={styles.text}>Hello Swiper</Text>
+                            </View>
+                            <View style={styles.slide2}>
+                                <Text style={styles.text}>Beautiful</Text>
+                            </View>
+                            <View style={styles.slide3}>
+                                <Text style={styles.text}>And simple</Text>
+                            </View>
+                        </Swiper>
                     </View>
                     <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' disabled={isGeneratingFlashCards} onPress={() => setOpenDeleteModal(true)}>
                         <Text className='text-white font-bold'>Generate New Cards</Text>
@@ -202,5 +213,32 @@ const FlashCards = () => {
         </SafeAreaView>
     )
 }
+
+const styles = StyleSheet.create({
+    wrapper: {},
+    slide1: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#9DD6EB'
+    },
+    slide2: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#97CAE5'
+    },
+    slide3: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#92BBD9'
+    },
+    text: {
+        color: '#fff',
+        fontSize: 30,
+        fontWeight: 'bold'
+    }
+})
 
 export default FlashCards
