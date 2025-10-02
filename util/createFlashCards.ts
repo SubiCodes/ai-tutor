@@ -53,9 +53,7 @@ async function summarizeChunk(text: string): Promise<string> {
     }
 }
 
-export const createFlashCardsJSON = async (
-    db: SQLite.SQLiteDatabase
-): Promise<string> => {
+export const createFlashCardsString= async ( db: SQLite.SQLiteDatabase ): Promise<string> => {
     try {
         const allRows = await getAllEmbeddings(db);
         const fullLecture = allRows.map((r) => r.text).join("\n\n");
@@ -132,7 +130,7 @@ export const createFlashCardsJSON = async (
     }
 };
 
-export const parseQuestions = (rawText: string) => {
+export const parseQuestionsToJson = (rawText: string) => {
     let parsed: Array<{ question: string; answer: string }> = [];
     try {
         parsed = JSON.parse(rawText);
