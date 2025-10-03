@@ -215,13 +215,6 @@ const FlashCards = () => {
                                 </View>
                             )
                         })}
-
-                        <View className='flex-1'>
-                            <Text >2</Text>
-                        </View>
-                        <View className='flex-1'>
-                            <Text>3</Text>
-                        </View>
                     </Carousel>
                     <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' disabled={isGeneratingFlashCards} onPress={() => setOpenDeleteModal(true)}>
                         <Text className='text-white font-bold'>Generate New Cards</Text>
