@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Toast, { Toast as ToastFunc } from 'toastify-react-native';
 import AlertDelete from '@/components/AlertDelete';
 import Carousel from "pinar";
+import FlashCard from '@/components/FlashCard'
 
 export type FlashCard = {
     question: string;
@@ -205,7 +206,7 @@ const FlashCards = () => {
                     {/* CARDS CONTAINER */}
                     <Carousel showsControls={false}>
                         <View className='flex-1'>
-                            <Text>1</Text>
+                            <FlashCard/>
                         </View>
                         <View className='flex-1'>
                             <Text >2</Text>
