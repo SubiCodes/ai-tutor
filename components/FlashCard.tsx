@@ -7,36 +7,51 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 
-const RegularContent = () => {
-    return (
-        <View className='flex-1 min-w-full min-h-full bg-blue-400 rounded-lg items-center justify-center flex-col p-2'>
-            <View className='self-start'>
-                <Text className='text-gray-300'>Question</Text>
-            </View>
-            <View className='flex-1 items-center justify-center'>
-                <Text className='text-2xl font-bold text-white text-center'>Regular content dadasdasdas   adadasdasdas  asdas</Text>
-            </View>
-            <View className='items-center justify-center'>
-                <Text className='text-gray-300'>1 of 15</Text>
-            </View>
-        </View>
-    );
+type ContentProps = {
+  question?: string;
+  answer?: string;
+  number: number;
+  total: number;
 };
 
-const FlippedContent = () => {
-    return (
-        <View className='flex-1 min-w-full min-h-full bg-green-500 rounded-lg items-center justify-center flex-col p-2'>
-            <View className='self-start'>
-                <Text className='text-gray-300'>Answer</Text>
-            </View>
-            <View className='flex-1 items-center justify-center'>
-                <Text className='text-2xl font-bold text-white text-center'>Regular content dadasdasdas   adadasdasdas  asdas</Text>
-            </View>
-            <View className='items-center justify-center'>
-                <Text className='text-gray-300'>1 of 15</Text>
-            </View>
-        </View>
-    );
+const RegularContent: React.FC<ContentProps> = ({ question, number, total }) => {
+  return (
+    <View className="flex-1 min-w-full min-h-full bg-violet-400 rounded-lg items-center justify-center flex-col p-2">
+      <View className="self-start">
+        <Text className="text-gray-300">Question</Text>
+      </View>
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-2xl font-bold text-white text-center">
+          {question}
+        </Text>
+      </View>
+      <View className="items-center justify-center">
+        <Text className="text-gray-300">
+          {number} of {total}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+const FlippedContent: React.FC<ContentProps> = ({ answer, number, total }) => {
+  return (
+    <View className="flex-1 min-w-full min-h-full bg-[#50C878] rounded-lg items-center justify-center flex-col p-2">
+      <View className="self-start">
+        <Text className="text-gray-300">Answer</Text>
+      </View>
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-2xl font-bold text-white text-center">
+          {answer}
+        </Text>
+      </View>
+      <View className="items-center justify-center">
+        <Text className="text-gray-300">
+          {number} of {total}
+        </Text>
+      </View>
+    </View>
+  );
 };
 
 
@@ -48,6 +63,18 @@ type FlipCardProps = {
     RegularContent?: ReactNode;
     FlippedContent?: ReactNode;
     toggleFlip?: () => void;
+    data: FlashCardProps
+};
+
+export type FlashCardProps = {
+    question: string;
+    answer: string;
+    amountOfQuestions: number;
+    number: number
+}
+
+type FlashCardComponentProps = {
+  data: FlashCardProps;
 };
 
 const FlipCard: React.FC<FlipCardProps> = ({
@@ -57,7 +84,8 @@ const FlipCard: React.FC<FlipCardProps> = ({
     duration = 500,
     RegularContent,
     FlippedContent,
-    toggleFlip
+    toggleFlip,
+    data
 }) => {
     const isDirectionX = direction === 'x';
 
@@ -125,7 +153,7 @@ const flipCardStyles = StyleSheet.create({
     },
 });
 
-export default function FlashCard() {
+export default function FlashCard({data} : FlashCardComponentProps) {
     const isFlipped = useSharedValue(false);
 
     const handlePress = () => {
@@ -137,9 +165,10 @@ export default function FlashCard() {
             <FlipCard
                 isFlipped={isFlipped}
                 cardStyle={styles.flipCard}
-                FlippedContent={<FlippedContent />}
-                RegularContent={<RegularContent />}
+                FlippedContent={<FlippedContent answer={data.answer} number={data.number} total={data.amountOfQuestions}/>}
+                RegularContent={<RegularContent question={data.question} number={data.number} total={data.amountOfQuestions}/>}
                 toggleFlip={handlePress}
+                data={data}
             />
         </SafeAreaView>
     );
