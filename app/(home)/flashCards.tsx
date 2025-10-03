@@ -69,7 +69,6 @@ const FlashCards = () => {
             await deleteFlashCardTableData(db);
             await postToFlashCard(db, rawQuestions);
             const parsedQuestions = await parseQuestionsToJson(rawQuestions);
-            console.log(parsedQuestions);
             setFlashCards(parsedQuestions);
         } catch (error) {
             ToastFunc.show({
