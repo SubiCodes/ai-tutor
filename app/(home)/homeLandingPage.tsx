@@ -22,6 +22,7 @@ import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 import { deleteConversationTableData } from '@/db/conversationFunctions';
 import { deleteCheatSheetTableData } from '@/db/cheatSheetFunctions';
 import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage';
+import { deleteFlashCardTableData } from '@/db/flashCardFunctions';
 
 const HomeLandingPage = () => {
 
@@ -86,6 +87,7 @@ const HomeLandingPage = () => {
             await deleteEmbeddingsTableData(db);
             await deleteConversationTableData(db);
             await deleteCheatSheetTableData(db);
+            await deleteFlashCardTableData(db);
 
             for (let i = 0; i < chunks.length; i++) {
                 const embeddingArr = allEmbeddings[i];
@@ -115,6 +117,9 @@ const HomeLandingPage = () => {
         try {
             await AsyncStorage.removeItem("tutorKnowledge");
             await deleteEmbeddingsTableData(db!);
+            await deleteFlashCardTableData(db!);
+            await deleteConversationTableData(db!);
+            await deleteCheatSheetTableData(db!);
             setFile(null);
         } catch (err) {
             console.error("Error removing file:", err);
