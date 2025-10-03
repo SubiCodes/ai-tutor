@@ -33,13 +33,6 @@ const FlashCards = () => {
     const [isGeneratingFlashCards, setIsGeneratingFlashCards] = useState<boolean>(false);
     const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
-    const renderItem = ({ item }: { item: any }) => (
-        <View className='bg-blue-500'>
-            <Text>{item.title}</Text>
-        </View>
-    );
-
-
     const getFileName = async () => {
         const currentFile = await getCurrentFileFromAsyncStorage();
         setFileName(currentFile.name);
