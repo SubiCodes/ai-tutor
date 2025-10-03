@@ -44,7 +44,7 @@ const HomeLandingPage = () => {
             console.warn("Database not ready yet!");
             return;
         }
-        setIsUploading(true);
+        
         try {
             const result = await DocumentPicker.getDocumentAsync({
                 type: [
@@ -69,6 +69,8 @@ const HomeLandingPage = () => {
             };
 
             setUploadProgress((prev) => ({ percentage: 44, message: "Extracting data..." }));
+
+            setIsUploading(true);
 
             const res = await extractTextFromFile(storedFile);
 
