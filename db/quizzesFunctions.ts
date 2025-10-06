@@ -8,8 +8,20 @@ export const postToQuizzes = async (db: SQLite.SQLiteDatabase, quiz: string, sco
 };
 
 export const getQuizResult = async (db: SQLite.SQLiteDatabase, id: number) => {
-    const allRows = await db.getAllAsync("SELECT * FROM quizzes WHERE id = ?", [id]);
-    return allRows as {
+    const quiz = await db.getAllAsync("SELECT * FROM quizzes WHERE id = ?", [id]);
+    return quiz as {
+        id: number;
+        quiz: string;
+        score: number;
+        total: number;
+        type: string;
+        date: string;
+    }[];
+};
+
+export const getQuizResults = async (db: SQLite.SQLiteDatabase) => {
+    const allQuizzes = await db.getAllAsync("SELECT * FROM quizzes");
+    return allQuizzes as {
         id: number;
         quiz: string;
         score: number;
