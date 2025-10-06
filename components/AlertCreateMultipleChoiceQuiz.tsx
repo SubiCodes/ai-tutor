@@ -109,7 +109,7 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                             <Text>Cancel</Text>
                         </AlertDialogCancel>
                         <AlertDialogAction onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 '>
-                            <Text className='bg-transparent'>Start Quiz</Text>
+                            <Text className='bg-transparent' onPress={() => onSubmit()}>Start Quiz</Text>
                         </AlertDialogAction>
                     </View>
                 </AlertDialogFooter>
