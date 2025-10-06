@@ -4,6 +4,9 @@ import { getQuizResults } from '@/db/quizzesFunctions'
 import * as SQLite from 'expo-sqlite';
 import { useFocusEffect } from 'expo-router';
 import { getDb } from '@/db/db';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AlertCreateMultipleChoiceQuiz from '@/components/AlertCreateMultipleChoiceQuiz';
+import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyncStorage';
 
 export type QuizData = {
     id: number;
@@ -19,12 +22,15 @@ const Main = () => {
     const [quizResults, setQuizResults] = useState<QuizData[] | []>([]);
     const [fetchingQuizzes, setFetchingQuizzes] = useState<boolean>(false);
 
-    const [showCreateQuizModal, setShowCreateQuizModal] = useState<boolean>(false);
+    const [fileName, setFileName] = useState<string>('File name');
+    const [showCreateQuizModal, setShowCreateQuizModal] = useState<boolean>(true);
 
     const fetchQuizzes = async () => {
         if (!db) return;
         setFetchingQuizzes(true);
         try {
+            const currentFile = await getCurrentFileFromAsyncStorage();
+            setFileName(currentFile.name);
             const quizzes = await getQuizResults(db);
             console.log(quizzes)
             setQuizResults(quizzes);
@@ -48,6 +54,7 @@ const Main = () => {
 
     return (
         <View>
+            <AlertCreateMultipleChoiceQuiz open={showCreateQuizModal} onClose={() => setShowCreateQuizModal(false)} onOpenChange={() => setShowCreateQuizModal(false)} fileName={fileName} />
             <Text>Main</Text>
         </View>
     )
