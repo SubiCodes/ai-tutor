@@ -24,7 +24,6 @@ export default function AuthLayout() {
           options={{
             title: 'Multiple Choices Quiz',
             headerShown: true,
-            headerLeft: () => <DrawerToggle />,
           }}
         />
         <Stack.Screen
