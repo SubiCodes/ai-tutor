@@ -19,6 +19,8 @@ const Main = () => {
     const [quizResults, setQuizResults] = useState<QuizData[] | []>([]);
     const [fetchingQuizzes, setFetchingQuizzes] = useState<boolean>(false);
 
+    const [showCreateQuizModal, setShowCreateQuizModal] = useState<boolean>(false);
+
     const fetchQuizzes = async () => {
         if (!db) return;
         setFetchingQuizzes(true);
