@@ -44,7 +44,7 @@ export const getDb = async (): Promise<SQLite.SQLiteDatabase> => {
         quiz TEXT NOT NULL,
         score INTEGER NOT NULL,
         total INTEGER NOT NULL,
-        type STRING NOT NULL,
+        type TEXT NOT NULL,
         date TEXT DEFAULT (datetime('now'))
       );
     `);
