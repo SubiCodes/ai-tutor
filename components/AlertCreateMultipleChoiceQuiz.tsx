@@ -15,18 +15,30 @@ import { View } from 'react-native';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Sparkles, ScrollText } from 'lucide-react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SQLite from 'expo-sqlite';
 import { useState } from 'react';
+import { createQuizzesString } from '@/util/createQuizzes';
 
 interface AlertOverlayProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onClose: () => void;
-    fileName: string
+    fileName: string;
+    type: string;
+    db: SQLite.SQLiteDatabase
 }
 
-const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName }: AlertOverlayProps) => {
+const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, type, db }: AlertOverlayProps) => {
     const [amount, setAmount] = useState<string>('5 questions');
+
+    const onSubmit = async () => {
+        let total = 0;
+        if (amount  === '5 questions') { total = 5 }; 
+        if (amount  === '10 questions') { total = 10 }; 
+        if (amount  === '15 questions') { total = 15 }; 
+        const quizString = await createQuizzesString(db, total, type);
+        console.log("QuizString result:", quizString || "<empty>");
+    }
 
     function onLabelPress(amount: string) {
         return () => {
@@ -96,7 +108,7 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName }
                         <AlertDialogCancel onPress={() => onClose()} className=''>
                             <Text>Cancel</Text>
                         </AlertDialogCancel>
-                        <AlertDialogAction onPress={() => onClose()} className='bg-blue-500 active:bg-blue-600 '>
+                        <AlertDialogAction onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 '>
                             <Text className='bg-transparent'>Start Quiz</Text>
                         </AlertDialogAction>
                     </View>
