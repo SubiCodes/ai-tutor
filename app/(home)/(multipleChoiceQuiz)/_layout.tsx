@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { StatusBar } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider, DrawerActions, useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ export default function AuthLayout() {
   const { colorScheme } = useColorScheme();
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -19,9 +20,9 @@ export default function AuthLayout() {
         }}
       >
         <Stack.Screen
-          name="homeLandingPage"
+          name="main"
           options={{
-            title: 'main',
+            title: 'Multiple Choices Quiz',
             headerShown: true,
             headerLeft: () => <DrawerToggle />,
           }}
