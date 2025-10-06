@@ -247,7 +247,7 @@ const HomeLandingPage = () => {
                         Start a quiz
                     </Text>
                     <View className="w-full flex-row gap-2 items-center justify-center">
-                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => Alert.alert("Feature coming soon!")}>
+                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => openPage('/(home)/(multipleChoiceQuiz)/main')}>
                             <LinearGradient
                                 colors={["#EC4899", "#F97316"]} // pink → orange
                                 start={{ x: 0, y: 0 }}
