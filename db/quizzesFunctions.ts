@@ -34,3 +34,7 @@ export const getQuizResults = async (db: SQLite.SQLiteDatabase) => {
 export const deleteQuizzesData = async (db: SQLite.SQLiteDatabase) => {
     await db.execAsync("DELETE FROM quizzes;");
 };
+
+export const deleteQuizData = async (db: SQLite.SQLiteDatabase, id: number) => {
+    await db.runAsync("DELETE FROM quizzes WHERE id = ?", [id]);
+};
