@@ -31,6 +31,6 @@ export const getQuizResults = async (db: SQLite.SQLiteDatabase) => {
     }[];
 };
 
-export const deleteFlashCardTableData = async (db: SQLite.SQLiteDatabase) => {
-    await db.execAsync("DELETE FROM flashCards;");
+export const deleteQuizzesData = async (db: SQLite.SQLiteDatabase) => {
+    await db.execAsync("DELETE FROM quizzes;");
 };
