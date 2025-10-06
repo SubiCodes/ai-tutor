@@ -37,6 +37,17 @@ export const getDb = async (): Promise<SQLite.SQLiteDatabase> => {
         questions TEXT NOT NULL
       );
     `);
+
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS quizzes (
+        id INTEGER PRIMARY KEY NOT NULL,
+        quiz TEXT NOT NULL,
+        score INTEGER NOT NULL,
+        total INTEGER NOT NULL,
+        type STRING NOT NULL,
+        date TEXT DEFAULT (datetime('now'))
+      );
+    `);
   }
   return db;
 };
