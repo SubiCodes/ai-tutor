@@ -42,7 +42,7 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                 type: 'info',
                 text1: 'Generating Quiz!',
                 text2: 'This may take a while.',
-                position: 'top',
+                position: 'bottom',
             })
             let total = 0;
             if (amount === '5 questions') { total = 5 };
@@ -132,7 +132,7 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                             <Text className='text-black'>Cancel</Text>
                         </Button>
                         <Button onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 ' disabled={creatingQuiz}>
-                            <Text className='bg-transparent' onPress={() => onSubmit()}>Start Quiz</Text>
+                            <Text className='bg-transparent active:bg-transparent' onPress={() => onSubmit()}>Start Quiz</Text>
                         </Button>
                     </View>
                 </AlertDialogFooter>
