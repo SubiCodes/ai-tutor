@@ -60,7 +60,7 @@ export const createQuizzesString = async (db: SQLite.SQLiteDatabase, amount: num
 
         const quizTypePrompt = type === "multiple choice"
             ? `[ 
-                { "question": "question here", "answer": "a, b, c or d", "choices": "choices here" },
+                { "question": "question here", "answer": "a, b, c or d", "choices": "choice a ** choice b ** choice c ** choice d" },
                 { "question": "question here", "answer": "a, b, c or d", "choices": "choices here" }
                 ]`
             : `[
