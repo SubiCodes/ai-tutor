@@ -5,7 +5,8 @@ import AlertDelete from "@/components/AlertDelete";
 import { parseQuizToJson } from "@/util/createQuizzes";
 import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 import LoadingIndicator from "@/components/LoadingIndicator";
-
+import { SafeAreaView } from "react-native-safe-area-context";
+import Carousel from "pinar";
 
 export type QuizMultipleChoice = {
   question: string,
@@ -94,16 +95,46 @@ const Quiz = () => {
 
   if (convertingQuiz) {
     return (
-      <LoadingIndicator/>
+      <LoadingIndicator />
     )
   }
 
   return (
-    <View className="flex-1 items-center justify-center bg-background px-6">
-      <Text className="text-xl font-bold mb-2">Quiz</Text>
-      <Text className="text-foreground text-center">
-        {quizString || "No quiz data received."}
-      </Text>
+    <SafeAreaView className="flex-1 justify-start items-start bg-background px-0 pb-4 pt-0 gap-2" edges={["left", "right", "bottom"]}>
+
+      <View className='flex-1 w-full items-center justify-center'>
+        <Carousel showsControls={false}>
+          {quiz?.map((item, index) => {
+            const choiceArray =
+              typeof item.choices === "string"
+                ? item.choices.split("\n").filter((line) => line.trim() !== "")
+                : [];
+
+            return (
+              <View
+                key={index}
+                className="w-full p-6 items-start justify-center bg-card rounded-2xl shadow-sm"
+              >
+                <Text className="text-lg font-bold mb-4">
+                  {index + 1}. {item.question}
+                </Text>
+
+                {choiceArray.length > 0 ? (
+                  <View className="w-full gap-2">
+                    {choiceArray.map((choice, i) => (
+                      <Text key={i} className="text-base text-foreground">
+                        {choice}
+                      </Text>
+                    ))}
+                  </View>
+                ) : (
+                  <Text className="italic text-muted">No choices provided</Text>
+                )}
+              </View>
+            );
+          })}
+        </Carousel>
+      </View>
 
       <AlertDelete
         open={showConfirmModal}
@@ -115,7 +146,7 @@ const Quiz = () => {
         continueButtonText="Leave"
       />
       <Toast />
-    </View>
+    </SafeAreaView>
   );
 };
 
