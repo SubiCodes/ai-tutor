@@ -1,10 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import { useLocalSearchParams } from 'expo-router';
 
 const Quiz = () => {
+  const { quizString } = useLocalSearchParams();
   return (
     <View>
-      <Text>Quiz</Text>
+      <Text>{quizString}</Text>
     </View>
   )
 }

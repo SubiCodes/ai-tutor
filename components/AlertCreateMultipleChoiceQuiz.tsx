@@ -19,6 +19,7 @@ import * as SQLite from 'expo-sqlite';
 import { useState } from 'react';
 import { createQuizzesString } from '@/util/createQuizzes';
 import { Router } from 'expo-router';
+import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 
 interface AlertOverlayProps {
     open: boolean;
@@ -32,14 +33,34 @@ interface AlertOverlayProps {
 
 const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, type, db, router }: AlertOverlayProps) => {
     const [amount, setAmount] = useState<string>('5 questions');
+    const [creatingQuiz, setCreatinguiz] = useState<boolean>(false);
 
     const onSubmit = async () => {
-        let total = 0;
-        if (amount  === '5 questions') { total = 5 }; 
-        if (amount  === '10 questions') { total = 10 }; 
-        if (amount  === '15 questions') { total = 15 }; 
-        const quizString = await createQuizzesString(db, total, type);
-        console.log("QuizString result:", quizString || "<empty>");
+        setCreatinguiz(true);
+        try {
+            ToastFunc.show({
+                type: 'info',
+                text1: 'Generating Quiz!',
+                text2: 'This may take a while.',
+                position: 'top',
+            })
+            let total = 0;
+            if (amount === '5 questions') { total = 5 };
+            if (amount === '10 questions') { total = 10 };
+            if (amount === '15 questions') { total = 15 };
+            const quizString = await createQuizzesString(db, total, type);
+            onClose();
+            if (quizString.trim()) {
+                router.push({
+                    pathname: '/(home)/(multipleChoiceQuiz)/quiz',
+                    params: { quizString: quizString }
+                })
+            };
+        } catch (error) {
+            console.log("Error Creating Quiz: ", error);
+        } finally {
+            setCreatinguiz(false)
+        }
     }
 
     function onLabelPress(amount: string) {
@@ -107,15 +128,16 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                 </AlertDialogDescription>
                 <AlertDialogFooter>
                     <View className="flex-row w-full items-end justify-end gap-2 mt-2">
-                        <AlertDialogCancel onPress={() => onClose()} className=''>
-                            <Text>Cancel</Text>
-                        </AlertDialogCancel>
-                        <AlertDialogAction onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 '>
+                        <Button onPress={() => onClose()} className='bg-muted' disabled={creatingQuiz}>
+                            <Text className='text-black'>Cancel</Text>
+                        </Button>
+                        <Button onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 ' disabled={creatingQuiz}>
                             <Text className='bg-transparent' onPress={() => onSubmit()}>Start Quiz</Text>
-                        </AlertDialogAction>
+                        </Button>
                     </View>
                 </AlertDialogFooter>
             </AlertDialogContent>
+            <Toast />
         </AlertDialog>
     )
 }
