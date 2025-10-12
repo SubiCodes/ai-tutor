@@ -18,6 +18,7 @@ import { Sparkles, ScrollText } from 'lucide-react-native'
 import * as SQLite from 'expo-sqlite';
 import { useState } from 'react';
 import { createQuizzesString } from '@/util/createQuizzes';
+import { Router } from 'expo-router';
 
 interface AlertOverlayProps {
     open: boolean;
@@ -26,9 +27,10 @@ interface AlertOverlayProps {
     fileName: string;
     type: string;
     db: SQLite.SQLiteDatabase
+    router: Router
 }
 
-const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, type, db }: AlertOverlayProps) => {
+const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, type, db, router }: AlertOverlayProps) => {
     const [amount, setAmount] = useState<string>('5 questions');
 
     const onSubmit = async () => {
