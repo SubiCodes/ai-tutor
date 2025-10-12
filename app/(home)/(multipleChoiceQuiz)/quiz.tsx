@@ -1,12 +1,54 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, BackHandler } from "react-native";
 import { useLocalSearchParams, useFocusEffect, useNavigation, useRouter } from "expo-router";
 import AlertDelete from "@/components/AlertDelete";
+import { parseQuizToJson } from "@/util/createQuizzes";
+import Toast, { Toast as ToastFunc } from 'toastify-react-native'
+import LoadingIndicator from "@/components/LoadingIndicator";
+
+
+export type QuizMultipleChoice = {
+  question: string,
+  answer: string,
+  choices?: string | undefined,
+}
 
 const Quiz = () => {
   const { quizString } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
+
+  const [quiz, setQuiz] = useState<QuizMultipleChoice[] | null>(null);
+  const [convertingQuiz, setConvertingQuiz] = useState<boolean>(false);
+
+  const convertQuizStringToJSON = async () => {
+    setConvertingQuiz(true);
+    try {
+      ToastFunc.show({
+        type: 'info',
+        text1: 'Preparing your Quiz!',
+        text2: 'Goodluck with the upcoming task!',
+        position: 'bottom',
+      });
+      const JSONQuiz = await parseQuizToJson(quizString.toLocaleString());
+      setQuiz(JSONQuiz);
+    } catch (error) {
+      console.log("Error turning quiz to JSON: ", error);
+      router.back()
+      ToastFunc.show({
+        type: 'error',
+        text1: 'Unable to prepare quiz!',
+        text2: 'Please try again',
+        position: 'bottom',
+      });
+    } finally {
+      setConvertingQuiz(false);
+    }
+  }
+
+  useFocusEffect(useCallback(() => {
+    convertQuizStringToJSON()
+  }, []))
 
   //#region Modal State & Handlers for exiting page
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -50,6 +92,12 @@ const Quiz = () => {
   );
   //#endregion
 
+  if (convertingQuiz) {
+    return (
+      <LoadingIndicator/>
+    )
+  }
+
   return (
     <View className="flex-1 items-center justify-center bg-background px-6">
       <Text className="text-xl font-bold mb-2">Quiz</Text>
@@ -66,6 +114,7 @@ const Quiz = () => {
         description="Are you sure you want to leave this quiz? Your progress will be lost."
         continueButtonText="Leave"
       />
+      <Toast />
     </View>
   );
 };
