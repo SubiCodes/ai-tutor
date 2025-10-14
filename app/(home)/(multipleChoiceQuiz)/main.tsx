@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { SlidersHorizontal } from 'lucide-react-native';
 import BottomSheet from '@/components/BottomSheet';
 import Animated, { useSharedValue } from 'react-native-reanimated';
+import BottomSheetFilterQuizzes from '@/components/BottomSheetFilterQuizzes';
 
 export type QuizQuestion = {
     question: string;
@@ -36,10 +37,9 @@ const Main = () => {
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
     const router = useRouter();
 
-    const isOpen = useSharedValue(false);
-
+    const isFilterOpen = useSharedValue(false);
     const toggleSheet = () => {
-        isOpen.value = !isOpen.value;
+        isFilterOpen.value = !isFilterOpen.value;
     };
 
     const [quizResults, setQuizResults] = useState<QuizData[] | []>([]);
@@ -133,14 +133,7 @@ const Main = () => {
                     <Sparkles size={16} color={"white"} />
                 </Button>
             </View>
-            <BottomSheet isOpen={isOpen} toggleSheet={toggleSheet}>
-                <Animated.Text className="text-gray-800 dark:text-gray-200 text-base mb-3">
-                    Discover how convenient bottom sheets can be in your app.
-                </Animated.Text>
-                <Pressable className="bg-blue-500 p-3 rounded-xl mt-3">
-                    <Text className="text-white text-center font-medium">Read More</Text>
-                </Pressable>
-            </BottomSheet>
+            <BottomSheetFilterQuizzes isOpen={isFilterOpen} toggleSheet={toggleSheet} />
         </SafeAreaView >
     )
 }

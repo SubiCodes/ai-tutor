@@ -1,11 +1,11 @@
-import React from "react";
-import { View, TouchableOpacity, Dimensions } from "react-native";
+import React, { useEffect } from "react";
+import { View, TouchableWithoutFeedback, Dimensions } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   useDerivedValue,
-  SharedValue,
+  runOnJS,SharedValue
 } from "react-native-reanimated";
 
 type BottomSheetProps = {
@@ -25,26 +25,30 @@ export default function BottomSheet({
 }: BottomSheetProps) {
   const height = useSharedValue(0);
 
-  // Animation progress (0 = open, 1 = closed)
+  // Animate sheet position
   const progress = useDerivedValue(() =>
     withTiming(isOpen.value ? 0 : 1, { duration })
   );
 
-  // Slide up animation
+  // Sheet slide animation
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: progress.value * height.value }],
   }));
 
-  // Dimmed background animation
+  // Backdrop fade animation
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: withTiming(isOpen.value ? 1 : 0, { duration }),
-    zIndex: isOpen.value ? 999 : -1,
+    zIndex: isOpen.value ? 1000 : -1,
   }));
+
+  // ✅ Prevent backdrop clicks when closed
+  const pointerEvents = isOpen.value ? "auto" : "none";
 
   return (
     <>
-      {/* 🔹 Backdrop (press to close) */}
+      {/* ✅ Fullscreen backdrop */}
       <Animated.View
+        pointerEvents={pointerEvents}
         style={[
           {
             position: "absolute",
@@ -57,17 +61,18 @@ export default function BottomSheet({
           },
           backdropStyle,
         ]}
-        // ✅ ensures backdrop always intercepts touches when open
-        pointerEvents={isOpen.value ? "auto" : "none"}
       >
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{ flex: 1 }}
-          onPress={toggleSheet}
-        />
+        {/* ✅ TouchableWithoutFeedback ensures clicks go through */}
+        <TouchableWithoutFeedback
+          onPress={() => {
+            runOnJS(toggleSheet)(); // safely toggle from UI thread
+          }}
+        >
+          <View style={{ flex: 1 }} />
+        </TouchableWithoutFeedback>
       </Animated.View>
 
-      {/* 🔹 Bottom Sheet (full width) */}
+      {/* ✅ Bottom sheet */}
       <Animated.View
         onLayout={(e) => {
           height.value = e.nativeEvent.layout.height;
@@ -79,8 +84,8 @@ export default function BottomSheet({
             bottom: 0,
             left: 0,
             width: SCREEN_WIDTH,
-            zIndex: 1000,
-            elevation: 1000,
+            zIndex: 1001,
+            elevation: 1001,
           },
         ]}
         className="rounded-t-2xl bg-white dark:bg-neutral-900 p-5 shadow-2xl"
