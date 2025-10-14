@@ -1,18 +1,17 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import { QuizData } from '@/app/(home)/(multipleChoiceQuiz)/main'
 
 interface CardQuizResultProps {
-  id?: string
-  date?: string
-  totalItems?: number
-  correctAnswers?: number
-  type?:string
+  data: QuizData
 }
 
-const CardQuizResult = ({ id = '1', date = '14 Oct 2025', totalItems = 10, correctAnswers = 8, type =  'Multiple Choice' }: CardQuizResultProps) => {
-  // Calculate percentage, grade, and remarks based on correctAnswers and totalItems
-  const percentage = Math.round((correctAnswers / totalItems) * 100)
-  
+const CardQuizResult = ({ data }: CardQuizResultProps) => {
+  const { id, quiz, score, total, type, date } = data
+
+  // Calculate percentage based on score and total
+  const percentage = Math.round((score / total) * 100)
+
   const getGrade = (percentage: number): string => {
     if (percentage >= 90) return 'A'
     if (percentage >= 80) return 'B'
@@ -73,7 +72,7 @@ const CardQuizResult = ({ id = '1', date = '14 Oct 2025', totalItems = 10, corre
         <View className="flex-1">
           <View className="flex-row items-baseline gap-2 mb-1">
             <Text className="text-lg font-bold text-gray-800">
-              {correctAnswers}/{totalItems}
+              {score}/{total}
             </Text>
             <Text className="text-sm text-gray-500">
               {percentage}%

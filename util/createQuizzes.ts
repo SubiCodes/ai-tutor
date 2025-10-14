@@ -94,7 +94,7 @@ export const createQuizzesString = async (db: SQLite.SQLiteDatabase, amount: num
         - Keep questions clear and answers concise.
         - Return ONLY valid JSON. No explanations, no text outside the array.
         - Only make ${amount} amount of questions.
-        - Do not add styling to the text.
+        - Do not add styling to the text such as \ etc..
     `.trim();
 
         const apiKey = process.env.EXPO_PUBLIC_API_OPENAI;

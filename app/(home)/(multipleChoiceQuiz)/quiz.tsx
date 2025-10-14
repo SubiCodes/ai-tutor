@@ -94,46 +94,54 @@ const Quiz = () => {
 
   //Checking of quiz
   const onSubmit = async () => {
-    if (!db) return
+    if (!db) return;
+    if (!quizWithAnswer) return;
     setIsChecking(true);
+
     try {
       setCheckingState({ state: "Checking if all are answered", percent: 20 });
+
       const hasUnanswered = quizWithAnswer?.some((q) => !q.userAnswer?.trim());
       if (hasUnanswered) {
         ToastFunc.show({
-          type: 'error',
-          text1: 'Questions missing answers',
-          text2: 'Please answer each question!',
-          position: 'top',
+          type: "error",
+          text1: "Questions missing answers",
+          text2: "Please answer each question!",
+          position: "top",
         });
         return;
       }
 
       setCheckingState({ state: "Checking answers", percent: 60 });
-      quizWithAnswer?.forEach((question, index) => {
-        if (question.userAnswer !== question.answer) {
-          setCheckArray(prev => {
-            const updatedArray = [...prev];
-            updatedArray[index] = false;
-            return updatedArray;
-          });
-        }
+
+      let correctCount = 0;
+      const checkArray: boolean[] = quizWithAnswer.map((q) => {
+        const isCorrect = q.userAnswer === q.answer;
+        if (isCorrect) correctCount++;
+        return isCorrect;
       });
 
-      setCheckingState({ state: "Posting Results", percent: 80 });
-      const quizWithAnswersString = JSON.stringify(quizWithAnswer);
-      await postToQuizzes(db, quizWithAnswersString, checkedArray.filter(Boolean).length, quizWithAnswer?.length ?? 0,"multiple choices");
+      setCheckArray(checkArray);
 
+      setCheckingState({ state: "Posting Results", percent: 80 });
+
+      const quizWithAnswersString = JSON.stringify(quizWithAnswer);
+      const total = quizWithAnswer.length;
+      const score = correctCount;
+
+      console.log(`Score: ${score}/${total}`);
+      await postToQuizzes(db, quizWithAnswersString, score, total, "Multiple Choice" );
       setCheckingState({ state: "Checking Complete", percent: 100 });
 
       setIsChecked(true);
       setShowResults(true);
     } catch (error) {
-
+      console.error("Error checking quiz:", error);
     } finally {
       setIsChecking(false);
     }
   };
+
 
   //Prepare score container
   useEffect(() => {

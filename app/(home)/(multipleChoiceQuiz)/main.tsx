@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { getQuizResults } from '@/db/quizzesFunctions'
+import { deleteQuizzesData, getQuizResults } from '@/db/quizzesFunctions'
 import * as SQLite from 'expo-sqlite';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { getDb } from '@/db/db';
@@ -12,9 +12,16 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, ScrollText } from 'lucide-react-native'
 import CardQuizResult from '@/components/CardQuizResult';
 
+export type QuizQuestion = {
+    question: string;
+    answer: string;
+    choices: string;
+    userAnswer: string;
+};
+
 export type QuizData = {
     id: number;
-    quiz: string;
+    quiz: QuizQuestion[];
     score: number;
     total: number;
     type: string;
@@ -38,12 +45,24 @@ const Main = () => {
             const currentFile = await getCurrentFileFromAsyncStorage();
             setFileName(currentFile.name);
             const quizzes = await getQuizResults(db);
-            setQuizResults(quizzes);
+            const parsedQuizzes = quizzes.map((quiz: any) => ({
+                ...quiz,
+                quiz: typeof quiz.quiz === "string" ? JSON.parse(quiz.quiz) : quiz.quiz,
+            }));
+
+            setQuizResults(parsedQuizzes);
+
+            console.log(parsedQuizzes);
         } catch (error) {
             console.log("Unable to get the results for quizzes.")
         } finally {
             setFetchingQuizzes(false);
         }
+    };
+
+    const deleteAllQuizzes = async () => {
+        if (!db) return;
+        await deleteQuizzesData(db)
     }
 
     useEffect(() => {
@@ -64,12 +83,13 @@ const Main = () => {
             )}
             <ScrollView className="w-full flex-1" showsVerticalScrollIndicator={false}>
                 {quizResults && quizResults.length > 0 ? (
-                    // ✅ Render quiz list here
-                    quizResults.map((quiz, index) => (
-                        <View key={index} className="bg-card mb-3 rounded-2xl shadow-sm w-full">
-                            <CardQuizResult/>
-                        </View>
-                    ))
+                    <View className='w-full flex-col gap-1'>
+                        {quizResults.map((quiz, index) => (
+                            <View key={index} className="bg-card mb-2 rounded-2xl shadow-sm w-full">
+                                <CardQuizResult data={quiz} />
+                            </View>
+                        ))}
+                    </View>
                 ) : (
                     // ❌ Empty state when no quiz results
                     <View className="flex-1 w-full items-center justify-center mt-24 px-4">
@@ -85,6 +105,10 @@ const Main = () => {
                     </View>
                 )}
             </ScrollView>
+            <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' onPress={() => deleteAllQuizzes()}>
+                <Text className='text-white font-bold'>Delete</Text>
+                <Sparkles size={16} color={"white"} />
+            </Button>
             <View className='w-full'>
                 <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' onPress={() => setShowCreateQuizModal(true)}>
                     <Text className='text-white font-bold'>Generate new quiz</Text>
