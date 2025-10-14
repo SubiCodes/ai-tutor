@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import AlertLoadingWithState from "@/components/AlertLoadingWithState";
 import AlertQuizResult from "@/components/AlertQuizResult";
 import { getCurrentFileFromAsyncStorage } from "@/util/getTheCurrentFileFromAsyncStorage";
+import * as SQLite from 'expo-sqlite';
+import { getDb } from "@/db/db";
+import { postToQuizzes } from "@/db/quizzesFunctions";
 
 export type QuizMultipleChoice = {
   question: string,
@@ -27,6 +30,8 @@ export type QuizMultipleChoiceWithAnswers = {
 
 const Quiz = () => {
   const { quizString } = useLocalSearchParams();
+
+  const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
   const navigation = useNavigation();
   const router = useRouter();
   const [fileName, setFileName] = useState<string>('File name');
@@ -89,6 +94,7 @@ const Quiz = () => {
 
   //Checking of quiz
   const onSubmit = async () => {
+    if (!db) return
     setIsChecking(true);
     try {
       setCheckingState({ state: "Checking if all are answered", percent: 20 });
@@ -113,6 +119,9 @@ const Quiz = () => {
           });
         }
       });
+
+      const quizWithAnswersString = JSON.stringify(quizWithAnswer);
+      await postToQuizzes(db, quizWithAnswersString, checkedArray.filter(Boolean).length, quizWithAnswer?.length ?? 0,"multiple choices")
 
       setIsChecked(true);
       setShowResults(true);
@@ -175,6 +184,13 @@ const Quiz = () => {
     }, [navigation, showConfirmModal])
   );
   //#endregion
+
+  useEffect(() => {
+    (async () => {
+      const database = await getDb();
+      setDb(database);
+    })();
+  }, []);
 
   if (convertingQuiz) {
     return (
