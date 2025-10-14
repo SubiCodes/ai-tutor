@@ -10,6 +10,7 @@ import { getCurrentFileFromAsyncStorage } from '@/util/getTheCurrentFileFromAsyn
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ScrollText } from 'lucide-react-native'
+import CardQuizResult from '@/components/CardQuizResult';
 
 export type QuizData = {
     id: number;
@@ -57,7 +58,7 @@ const Main = () => {
     }, [db]))
 
     return (
-        <SafeAreaView className="flex-1 justify-start items-start bg-background px-6 pt-4 py-4" edges={["left", "right", "bottom"]}>
+        <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 pt-4 py-4" edges={["left", "right", "bottom"]}>
             {db && (
                 <AlertCreateMultipleChoiceQuiz open={showCreateQuizModal} onClose={() => setShowCreateQuizModal(false)} onOpenChange={() => setShowCreateQuizModal(false)} fileName={fileName} type='multiple choice' db={db} router={router} />
             )}
@@ -65,8 +66,8 @@ const Main = () => {
                 {quizResults && quizResults.length > 0 ? (
                     // ✅ Render quiz list here
                     quizResults.map((quiz, index) => (
-                        <View key={index} className="bg-card p-4 mb-3 rounded-2xl shadow-sm w-full">
-                            
+                        <View key={index} className="bg-card mb-3 rounded-2xl shadow-sm w-full">
+                            <CardQuizResult/>
                         </View>
                     ))
                 ) : (
