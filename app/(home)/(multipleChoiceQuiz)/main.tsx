@@ -37,7 +37,6 @@ const Main = () => {
             const currentFile = await getCurrentFileFromAsyncStorage();
             setFileName(currentFile.name);
             const quizzes = await getQuizResults(db);
-            console.log(quizzes)
             setQuizResults(quizzes);
         } catch (error) {
             console.log("Unable to get the results for quizzes.")
