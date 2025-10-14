@@ -105,10 +105,10 @@ const Main = () => {
                     </View>
                 )}
             </ScrollView>
-            <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' onPress={() => deleteAllQuizzes()}>
+            {/* <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' onPress={() => deleteAllQuizzes()}>
                 <Text className='text-white font-bold'>Delete</Text>
                 <Sparkles size={16} color={"white"} />
-            </Button>
+            </Button> */}
             <View className='w-full'>
                 <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' onPress={() => setShowCreateQuizModal(true)}>
                     <Text className='text-white font-bold'>Generate new quiz</Text>

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Sparkles, ScrollText } from 'lucide-react-native'
@@ -131,7 +131,10 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                         <Button onPress={() => onClose()} className='bg-muted' disabled={creatingQuiz}>
                             <Text className='text-black'>Cancel</Text>
                         </Button>
-                        <Button onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 ' disabled={creatingQuiz}>
+                        <Button onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 items-center justify-center' disabled={creatingQuiz}>
+                            {creatingQuiz && (
+                                <ActivityIndicator size={12} color={'white'}/>
+                            )}
                             <Text className='bg-transparent active:bg-transparent' onPress={() => onSubmit()}>Start Quiz</Text>
                         </Button>
                     </View>
