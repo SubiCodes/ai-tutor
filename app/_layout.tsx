@@ -14,6 +14,7 @@ import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export {
   ErrorBoundary,
@@ -56,32 +57,33 @@ export default function RootLayout() {
   }, []);
 
   return (
-
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-      <KeyboardProvider>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <AlertPersonalization open={openPersonalizationAlert} onOpenChange={setOpenPersonalizationAlert} />
-        <Drawer screenOptions={{
-          headerTintColor: "#3B82F6",
-          drawerActiveTintColor: "#3B82F6",
-          drawerInactiveTintColor: "#9CA3AF",
-          drawerActiveBackgroundColor: "#E0F2FE",
-        }}>
-          <Drawer.Screen name="(home)" options={{
-            headerShown: false, drawerLabel: "Home",
-            drawerIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
-            ),
-          }} />
-          <Drawer.Screen name="(settings)" options={{
-            headerShown: false, drawerLabel: "Settings", title: "Settings",
-            drawerIcon: ({ color, size }) => (
-              <Ionicons name="settings-outline" size={size} color={color} />
-            ),
-          }} />
-        </Drawer>
-      </KeyboardProvider>
-      <PortalHost />
-    </ThemeProvider>
+    <GestureHandlerRootView>
+      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+        <KeyboardProvider>
+          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+          <AlertPersonalization open={openPersonalizationAlert} onOpenChange={setOpenPersonalizationAlert} />
+          <Drawer screenOptions={{
+            headerTintColor: "#3B82F6",
+            drawerActiveTintColor: "#3B82F6",
+            drawerInactiveTintColor: "#9CA3AF",
+            drawerActiveBackgroundColor: "#E0F2FE",
+          }}>
+            <Drawer.Screen name="(home)" options={{
+              headerShown: false, drawerLabel: "Home",
+              drawerIcon: ({ color, size }) => (
+                <Ionicons name="home-outline" size={size} color={color} />
+              ),
+            }} />
+            <Drawer.Screen name="(settings)" options={{
+              headerShown: false, drawerLabel: "Settings", title: "Settings",
+              drawerIcon: ({ color, size }) => (
+                <Ionicons name="settings-outline" size={size} color={color} />
+              ),
+            }} />
+          </Drawer>
+        </KeyboardProvider>
+        <PortalHost />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
