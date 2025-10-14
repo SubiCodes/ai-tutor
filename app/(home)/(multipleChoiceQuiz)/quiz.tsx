@@ -209,10 +209,10 @@ const Quiz = () => {
                         return (
                           <Pressable
                             key={i}
-                            className={`w-full p-3 rounded-xl border border-border items-start ${isSelected ? "bg-green-500" : "bg-background/80"}`} onPress={() => handleUserAnswer(index, letter)}
+                            className={`w-full p-3 rounded-xl border border-border items-start bg-background/80 ${isSelected ? "border border-blue-400" : "border"}`} onPress={() => handleUserAnswer(index, letter)}
                             disabled={isChecked}
                           >
-                            <Text className={`text-base ${isSelected ? "text-white font-bold" : "text-foreground"}`}>
+                            <Text className={`text-base ${isSelected ? "text-blue-400 font-bold" : "text-foreground"}`}>
                               {choice}
                             </Text>
                           </Pressable>
