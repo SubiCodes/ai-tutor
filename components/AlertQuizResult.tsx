@@ -72,7 +72,7 @@ const AlertQuizResult = ({ open, onClose, fileName, totalItems, totalCorrectAnsw
                             <Percent size={24} color={"#f97316"} />
                         </View>
                         <View className='flex-col items-center justify-center'>
-                            <Text className='text-base font-bold'>{percentage}</Text>
+                            <Text className='text-base font-bold'>{percentage}%</Text>
                             <Text className='text-xs font-light'>Grade</Text>
                         </View>
                     </View>

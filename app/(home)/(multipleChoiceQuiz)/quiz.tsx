@@ -75,8 +75,9 @@ const Quiz = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [checkingState, setCheckingState] = useState<{ state: string, percent: number }>({ state: '', percent: 0 });
-  const [showResults, setShowResults] = useState<boolean>(true);
+  const [showResults, setShowResults] = useState<boolean>(false);
 
+  //Passing of answer
   const handleUserAnswer = (index: number, answer: string) => {
     setQuizWithAnswer((prev) => {
       if (!prev) return prev;
@@ -86,6 +87,7 @@ const Quiz = () => {
     });
   };
 
+  //Checking of quiz
   const onSubmit = async () => {
     setIsChecking(true);
     try {
@@ -102,13 +104,13 @@ const Quiz = () => {
       }
 
       setCheckingState({ state: "Checking answers", percent: 60 });
-      quizWithAnswer?.map((question, index) => {
-        if (question.answer !== question.answer) {
+      quizWithAnswer?.forEach((question, index) => {
+        if (question.userAnswer !== question.answer) {
           setCheckArray(prev => {
             const updatedArray = [...prev];
             updatedArray[index] = false;
             return updatedArray;
-          })
+          });
         }
       });
 
@@ -119,8 +121,14 @@ const Quiz = () => {
     } finally {
       setIsChecking(false);
     }
-
   };
+
+  //Prepare score container
+  useEffect(() => {
+    if (quiz?.length) {
+      setCheckArray(Array(quiz.length).fill(true));
+    }
+  }, [quiz]);
 
   //#endregion
 
@@ -190,10 +198,10 @@ const Quiz = () => {
             return (
               <View
                 key={index}
-                className="w-full h-full p-6 items-start justify-center bg-card rounded-2xl shadow-sm"
+                className={`w-full h-full p-6 items-start justify-center bg-card rounded-2xl shadow-sm`}
               >
                 <View
-                  className="flex-col w-full bg-background p-4 rounded-lg border border-gray-100"
+                  className={`flex-col w-full bg-background p-4 rounded-lg ${isChecked && !checkedArray[index] ? "border border-red-500" : "border border-gray-100"} ${isChecked && checkedArray[index] ? "border border-green-500" : "border border-gray-100"}`}
                   style={{
                     shadowColor: '#000',
                     shadowOffset: { width: 0, height: 6 },
@@ -207,19 +215,43 @@ const Quiz = () => {
                   {choiceArray.length > 0 ? (
                     <View className="flex-col w-full gap-3">
                       {choiceArray.map((choice, i) => {
-                        // Extract the letter before ")" — e.g., "a) Venus" → "a"
                         const letter = choice.trim().charAt(0).toLowerCase();
+                        const userAnswer = quizWithAnswer?.[index]?.userAnswer;
+                        const isSelected = userAnswer === letter;
+                        const isCorrect = letter === item.answer;
 
-                        const isSelected =
-                          quizWithAnswer?.[index]?.userAnswer === letter;
+                        // Conditional classes
+                        let choiceClasses = "w-full p-3 rounded-xl border items-start ";
+                        let textClasses = "text-base ";
+
+                        if (isChecked) {
+                          if (isSelected && !isCorrect) {
+                            // User selected wrong answer
+                            choiceClasses += "border-2 border-red-500 bg-background/80";
+                            textClasses += "text-red-500 font-bold";
+                          } else if (isCorrect) {
+                            // Correct answer
+                            choiceClasses += "bg-green-200 border border-green-400";
+                            textClasses += "text-green-800 font-bold";
+                          } else {
+                            // Neutral unselected choices
+                            choiceClasses += "border border-border bg-background/80";
+                            textClasses += "text-foreground";
+                          }
+                        } else {
+                          // Quiz not yet checked
+                          choiceClasses += isSelected ? "border border-blue-400 bg-background/80" : "border border-border bg-background/80";
+                          textClasses += isSelected ? "text-blue-400 font-bold" : "text-foreground";
+                        }
 
                         return (
                           <Pressable
                             key={i}
-                            className={`w-full p-3 rounded-xl border border-border items-start bg-background/80 ${isSelected ? "border border-blue-400" : "border"}`} onPress={() => handleUserAnswer(index, letter)}
+                            className={choiceClasses}
+                            onPress={() => handleUserAnswer(index, letter)}
                             disabled={isChecked}
                           >
-                            <Text className={`text-base ${isSelected ? "text-blue-400 font-bold" : "text-foreground"}`}>
+                            <Text className={textClasses}>
                               {choice}
                             </Text>
                           </Pressable>
@@ -229,6 +261,7 @@ const Quiz = () => {
                   ) : (
                     <Text className="italic text-muted">No choices provided</Text>
                   )}
+
                   <View className="w-full items-center justify-center mt-4">
                     <Text className="text-muted-foreground">{`Question ${index + 1} of ${quiz.length}`}</Text>
                   </View>
@@ -237,24 +270,26 @@ const Quiz = () => {
                 <View className="w-full flex-col">
                   <View className="flex-1 min-h-full"></View>
                   {!isChecked && quiz.length === index + 1 && (
-                    <Button
-                      className="bg-blue-400 active:bg-blue-500"
-                      onPress={onSubmit}
-                    >
-                      <Text className="bg-transparent active:bg-transparent text-white font-bold">
+                    <Button className="bg-blue-400 active:bg-blue-500" onPress={onSubmit}>
+                      <Text className="bg-transparent active:bg-transparent text-white font-bold" onPress={onSubmit}>
                         Submit Answers
                       </Text>
                     </Button>
                   )}
                   {isChecked && (
-                    <Button
-                      className="bg-blue-400 active:bg-blue-500"
-                      onPress={() => router.back()}
-                    >
-                      <Text className="bg-transparent active:bg-transparent text-white font-bold">
-                        Continue
-                      </Text>
-                    </Button>
+                    <View className="flex-row gap-2">
+                      <Button className="bg-muted active:bg-muted/80 w-[48%]" onPress={() => setShowResults(true)}>
+                        <Text className="bg-transparent text-muted-foreground active:bg-transparent font-bold" onPress={() => setShowResults(true)}>
+                          Show Results
+                        </Text>
+                      </Button>
+                      <Button className="bg-blue-400 active:bg-blue-500 w-[48%]" onPress={() => router.back()}>
+                        <Text className="bg-transparent active:bg-transparent text-white font-bold" onPress={() => router.back()}>
+                          Continue
+                        </Text>
+                      </Button>
+                    </View>
+
                   )}
                 </View>
               </View>
@@ -269,7 +304,7 @@ const Quiz = () => {
         onClose={handleCancelExit}
         onDelete={handleConfirmExit}
         title="Leave quiz?"
-        description="Are you sure you want to leave this quiz? Your progress will be lost."
+        description={isChecked ? "Are you done reviewing your quiz results?" : "Are you sure you want to leave this quiz? Your progress will be lost."}
         continueButtonText="Leave"
       />
       <AlertLoadingWithState
