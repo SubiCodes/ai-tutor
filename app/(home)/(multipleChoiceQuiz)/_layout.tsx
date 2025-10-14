@@ -22,7 +22,7 @@ export default function AuthLayout() {
         <Stack.Screen
           name="main"
           options={{
-            title: 'Multiple Choices Quiz',
+            title: 'Quizzes',
             headerShown: true,
           }}
         />

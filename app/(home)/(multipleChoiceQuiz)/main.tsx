@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { deleteQuizzesData, getQuizResults } from '@/db/quizzesFunctions'
 import * as SQLite from 'expo-sqlite';
@@ -11,6 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ScrollText } from 'lucide-react-native'
 import CardQuizResult from '@/components/CardQuizResult';
+import { Input } from '@/components/ui/input';
+import { SlidersHorizontal } from 'lucide-react-native';
 
 export type QuizQuestion = {
     question: string;
@@ -83,13 +85,21 @@ const Main = () => {
             )}
             <ScrollView className="w-full flex-1" showsVerticalScrollIndicator={false}>
                 {quizResults && quizResults.length > 0 ? (
-                    <View className='w-full flex-col gap-1'>
-                        {quizResults.map((quiz, index) => (
-                            <View key={index} className="bg-card mb-2 rounded-2xl shadow-sm w-full">
-                                <CardQuizResult data={quiz} />
-                            </View>
-                        ))}
-                    </View>
+                    <>
+                        <View className="flex-row items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2">
+                            <Text className='text-2xl font-bold text-blue-400 flex-1'>Quiz Results</Text>
+                            <TouchableOpacity className='items-center justify-center'>
+                                <SlidersHorizontal size={20} color={"#4B5563"}/>
+                            </TouchableOpacity>
+                        </View>
+                        <View className='w-full flex-col gap-1'>
+                            {quizResults.map((quiz, index) => (
+                                <View key={index} className="bg-card mb-2 rounded-2xl shadow-sm w-full">
+                                    <CardQuizResult data={quiz} />
+                                </View>
+                            ))}
+                        </View>
+                    </>
                 ) : (
                     // ❌ Empty state when no quiz results
                     <View className="flex-1 w-full items-center justify-center mt-24 px-4">
