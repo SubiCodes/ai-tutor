@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Pressable } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { deleteQuizzesData, getQuizResults } from '@/db/quizzesFunctions'
 import * as SQLite from 'expo-sqlite';
@@ -13,6 +13,8 @@ import { Sparkles, ScrollText } from 'lucide-react-native'
 import CardQuizResult from '@/components/CardQuizResult';
 import { Input } from '@/components/ui/input';
 import { SlidersHorizontal } from 'lucide-react-native';
+import BottomSheet from '@/components/BottomSheet';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 
 export type QuizQuestion = {
     question: string;
@@ -33,6 +35,12 @@ export type QuizData = {
 const Main = () => {
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
     const router = useRouter();
+
+    const isOpen = useSharedValue(false);
+
+    const toggleSheet = () => {
+        isOpen.value = !isOpen.value;
+    };
 
     const [quizResults, setQuizResults] = useState<QuizData[] | []>([]);
     const [fetchingQuizzes, setFetchingQuizzes] = useState<boolean>(false);
@@ -88,8 +96,8 @@ const Main = () => {
                     <>
                         <View className="flex-row items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2">
                             <Text className='text-2xl font-bold text-blue-400 flex-1'>Quiz Results</Text>
-                            <TouchableOpacity className='items-center justify-center'>
-                                <SlidersHorizontal size={20} color={"#4B5563"}/>
+                            <TouchableOpacity className='items-center justify-center' onPress={toggleSheet}>
+                                <SlidersHorizontal size={20} color={"#4B5563"} />
                             </TouchableOpacity>
                         </View>
                         <View className='w-full flex-col gap-1'>
@@ -125,7 +133,15 @@ const Main = () => {
                     <Sparkles size={16} color={"white"} />
                 </Button>
             </View>
-        </SafeAreaView>
+            <BottomSheet isOpen={isOpen} toggleSheet={toggleSheet}>
+                <Animated.Text className="text-gray-800 dark:text-gray-200 text-base mb-3">
+                    Discover how convenient bottom sheets can be in your app.
+                </Animated.Text>
+                <Pressable className="bg-blue-500 p-3 rounded-xl mt-3">
+                    <Text className="text-white text-center font-medium">Read More</Text>
+                </Pressable>
+            </BottomSheet>
+        </SafeAreaView >
     )
 }
 
