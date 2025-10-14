@@ -120,8 +120,11 @@ const Quiz = () => {
         }
       });
 
+      setCheckingState({ state: "Posting Results", percent: 80 });
       const quizWithAnswersString = JSON.stringify(quizWithAnswer);
-      await postToQuizzes(db, quizWithAnswersString, checkedArray.filter(Boolean).length, quizWithAnswer?.length ?? 0,"multiple choices")
+      await postToQuizzes(db, quizWithAnswersString, checkedArray.filter(Boolean).length, quizWithAnswer?.length ?? 0,"multiple choices");
+
+      setCheckingState({ state: "Checking Complete", percent: 100 });
 
       setIsChecked(true);
       setShowResults(true);
