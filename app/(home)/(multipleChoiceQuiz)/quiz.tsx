@@ -9,6 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Carousel from "pinar";
 import { Button } from "@/components/ui/button";
 import AlertLoadingWithState from "@/components/AlertLoadingWithState";
+import AlertQuizResult from "@/components/AlertQuizResult";
+import { getCurrentFileFromAsyncStorage } from "@/util/getTheCurrentFileFromAsyncStorage";
 
 export type QuizMultipleChoice = {
   question: string,
@@ -27,6 +29,7 @@ const Quiz = () => {
   const { quizString } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
+  const [fileName, setFileName] = useState<string>('File name');
 
   //#region Converting Quiz String into JSON
   const [quiz, setQuiz] = useState<QuizMultipleChoice[] | null>(null);
@@ -44,6 +47,8 @@ const Quiz = () => {
       const JSONQuiz = await parseQuizToJson(quizString.toLocaleString());
       setQuiz(JSONQuiz);
       setQuizWithAnswer(JSONQuiz);
+      const currentFile = await getCurrentFileFromAsyncStorage();
+      setFileName(currentFile.name);
     } catch (error) {
       console.log("Error turning quiz to JSON: ", error);
       router.back()
@@ -70,6 +75,7 @@ const Quiz = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [checkingState, setCheckingState] = useState<{ state: string, percent: number }>({ state: '', percent: 0 });
+  const [showResults, setShowResults] = useState<boolean>(true);
 
   const handleUserAnswer = (index: number, answer: string) => {
     setQuizWithAnswer((prev) => {
@@ -107,6 +113,7 @@ const Quiz = () => {
       });
 
       setIsChecked(true);
+      setShowResults(true);
     } catch (error) {
 
     } finally {
@@ -270,6 +277,13 @@ const Quiz = () => {
         currentState={checkingState.state}
         activity="Checking Quiz"
         progress={checkingState.percent}
+      />
+      <AlertQuizResult
+        open={showResults}
+        onClose={() => { setShowResults(false) }}
+        fileName={fileName}
+        totalItems={checkedArray.length}
+        totalCorrectAnswers={checkedArray.filter(Boolean).length}
       />
       <Toast />
     </SafeAreaView>
