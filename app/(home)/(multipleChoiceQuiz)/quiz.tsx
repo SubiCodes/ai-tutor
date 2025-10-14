@@ -27,20 +27,6 @@ const Quiz = () => {
   const navigation = useNavigation();
   const router = useRouter();
 
-  const [quizWithAnswer, setQuizWithAnswer] = useState<QuizMultipleChoiceWithAnswers[] | null>(null);
-  const handleUserAnswer = (index: number, answer: string) => {
-    setQuizWithAnswer((prev) => {
-      if (!prev) return prev;
-      const updated = [...prev];
-      updated[index] = { ...updated[index], userAnswer: answer };
-      return updated;
-    });
-  };
-
-  const onSubmit = async () => {
-    console.log(quizWithAnswer)
-  };
-
   //#region Converting Quiz String into JSON
   const [quiz, setQuiz] = useState<QuizMultipleChoice[] | null>(null);
   const [convertingQuiz, setConvertingQuiz] = useState<boolean>(false);
@@ -76,6 +62,37 @@ const Quiz = () => {
   }, []));
 
   //#endregion
+
+  //#region Functions for Answering Quiz
+  const [quizWithAnswer, setQuizWithAnswer] = useState<QuizMultipleChoiceWithAnswers[] | null>(null);
+  const [checkedArray, setCheckArray] = useState<boolean[]>(Array(quiz?.length).fill(true));
+
+  const handleUserAnswer = (index: number, answer: string) => {
+    setQuizWithAnswer((prev) => {
+      if (!prev) return prev;
+      const updated = [...prev];
+      updated[index] = { ...updated[index], userAnswer: answer };
+      return updated;
+    });
+  };
+
+  const onSubmit = async () => {
+    const hasUnanswered = quizWithAnswer?.some((q) => !q.userAnswer?.trim());
+    if (hasUnanswered) {
+      ToastFunc.show({
+        type: 'error',
+        text1: 'Questions missing answers',
+        text2: 'Please answer each question!',
+        position: 'top',
+      });
+      return;
+    }
+    console.log(quizWithAnswer)
+  };
+
+  //#endregion
+
+
 
   //#region Modal State & Handlers for exiting page
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -188,7 +205,7 @@ const Quiz = () => {
                   <View className="flex-1 min-h-full"></View>
                   {quiz.length === index + 1 && (
                     <Button className="bg-blue-400 active:bg-blue-500" onPress={onSubmit}>
-                      <Text className="bg-blue-400 active:bg-blue-500 text-white font-bold">Submit Answers</Text>
+                      <Text className="bg-transparent active:bg-transparent text-white font-bold">Submit Answers</Text>
                     </Button>
                   )}
                 </View>
