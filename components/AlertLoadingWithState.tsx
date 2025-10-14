@@ -16,7 +16,7 @@ import { View } from 'react-native';
 
 interface AlertOverlayProps {
     open: boolean;
-    onOpenChange: (open: boolean) => void;
+    onOpenChange?: (open: boolean) => void;
     currentState: string | null;
     activity: string;
     progress: number

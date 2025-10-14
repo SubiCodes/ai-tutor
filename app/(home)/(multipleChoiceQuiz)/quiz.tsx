@@ -8,6 +8,7 @@ import LoadingIndicator from "@/components/LoadingIndicator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Carousel from "pinar";
 import { Button } from "@/components/ui/button";
+import AlertLoadingWithState from "@/components/AlertLoadingWithState";
 
 export type QuizMultipleChoice = {
   question: string,
@@ -66,6 +67,9 @@ const Quiz = () => {
   //#region Functions for Answering Quiz
   const [quizWithAnswer, setQuizWithAnswer] = useState<QuizMultipleChoiceWithAnswers[] | null>(null);
   const [checkedArray, setCheckArray] = useState<boolean[]>(Array(quiz?.length).fill(true));
+  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState<boolean>(false);
+  const [checkingState, setCheckingState] = useState<{ state: string, percent: number }>({ state: '', percent: 0 });
 
   const handleUserAnswer = (index: number, answer: string) => {
     setQuizWithAnswer((prev) => {
@@ -77,17 +81,38 @@ const Quiz = () => {
   };
 
   const onSubmit = async () => {
-    const hasUnanswered = quizWithAnswer?.some((q) => !q.userAnswer?.trim());
-    if (hasUnanswered) {
-      ToastFunc.show({
-        type: 'error',
-        text1: 'Questions missing answers',
-        text2: 'Please answer each question!',
-        position: 'top',
+    setIsChecking(true);
+    try {
+      setCheckingState({ state: "Checking if all are answered", percent: 20 });
+      const hasUnanswered = quizWithAnswer?.some((q) => !q.userAnswer?.trim());
+      if (hasUnanswered) {
+        ToastFunc.show({
+          type: 'error',
+          text1: 'Questions missing answers',
+          text2: 'Please answer each question!',
+          position: 'top',
+        });
+        return;
+      }
+
+      setCheckingState({ state: "Checking answers", percent: 60 });
+      quizWithAnswer?.map((question, index) => {
+        if (question.answer !== question.answer) {
+          setCheckArray(prev => {
+            const updatedArray = [...prev];
+            updatedArray[index] = false;
+            return updatedArray;
+          })
+        }
       });
-      return;
+
+      setIsChecked(true);
+    } catch (error) {
+
+    } finally {
+      setIsChecking(false);
     }
-    console.log(quizWithAnswer)
+
   };
 
   //#endregion
@@ -185,6 +210,7 @@ const Quiz = () => {
                           <Pressable
                             key={i}
                             className={`w-full p-3 rounded-xl border border-border items-start ${isSelected ? "bg-green-500" : "bg-background/80"}`} onPress={() => handleUserAnswer(index, letter)}
+                            disabled={isChecked}
                           >
                             <Text className={`text-base ${isSelected ? "text-white font-bold" : "text-foreground"}`}>
                               {choice}
@@ -203,13 +229,27 @@ const Quiz = () => {
 
                 <View className="w-full flex-col">
                   <View className="flex-1 min-h-full"></View>
-                  {quiz.length === index + 1 && (
-                    <Button className="bg-blue-400 active:bg-blue-500" onPress={onSubmit}>
-                      <Text className="bg-transparent active:bg-transparent text-white font-bold">Submit Answers</Text>
+                  {!isChecked && quiz.length === index + 1 && (
+                    <Button
+                      className="bg-blue-400 active:bg-blue-500"
+                      onPress={onSubmit}
+                    >
+                      <Text className="bg-transparent active:bg-transparent text-white font-bold">
+                        Submit Answers
+                      </Text>
+                    </Button>
+                  )}
+                  {isChecked && (
+                    <Button
+                      className="bg-blue-400 active:bg-blue-500"
+                      onPress={() => router.back()}
+                    >
+                      <Text className="bg-transparent active:bg-transparent text-white font-bold">
+                        Continue
+                      </Text>
                     </Button>
                   )}
                 </View>
-
               </View>
             );
           })}
@@ -224,6 +264,12 @@ const Quiz = () => {
         title="Leave quiz?"
         description="Are you sure you want to leave this quiz? Your progress will be lost."
         continueButtonText="Leave"
+      />
+      <AlertLoadingWithState
+        open={isChecking}
+        currentState={checkingState.state}
+        activity="Checking Quiz"
+        progress={checkingState.percent}
       />
       <Toast />
     </SafeAreaView>
