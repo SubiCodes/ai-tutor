@@ -1,109 +1,119 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, { SharedValue } from "react-native-reanimated";
 import BottomSheet from "./BottomSheet";
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+type FilterType = {
+  type: "All" | "Multiple Choice" | "True or False";
+  sortBy: "Latest First" | "Oldest First";
+  grade: "All" | "A" | "B" | "C" | "D" | "F";
+};
 
 type FilterBottomSheetProps = {
   isOpen: SharedValue<boolean>;
   toggleSheet: () => void;
+  filters: FilterType;
+  setFilters: React.Dispatch<React.SetStateAction<FilterType>>;
 };
 
 export default function BottomSheetFilterQuizzes({
   isOpen,
   toggleSheet,
+  filters,
+  setFilters,
 }: FilterBottomSheetProps) {
+  const [tempFilters, setTempFilters] = useState<FilterType>(filters);
+
+  // Sync tempFilters with parent filters when sheet opens
+  useEffect(() => {
+    setTempFilters(filters);
+  }, [filters, isOpen.value]);
+
   return (
     <BottomSheet isOpen={isOpen} toggleSheet={toggleSheet}>
       <Animated.Text className="text-gray-800 dark:text-gray-200 text-2xl mb-3 font-extrabold">
         Filter Options
       </Animated.Text>
 
-      {/* Main Content */}
-      <View className="flex-1 p-2 flex-col gap-4">
-
-        {/* Sort by type */}
+      <View className="flex-1 p-2 flex-col gap-6">
+        {/* Quiz Type */}
         <View className="flex-col gap-2">
-          <Text className="text-lg font-semibold">
-            Quiz Type
-          </Text>
-          <View className="w-full flex-row flex-wrap">
-            <RadioGroup value="20" onValueChange={() => console.log("CHANGED")} className="flex-row">
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">All</Text>
+          <Text className="text-lg font-semibold">Quiz Type</Text>
+          <RadioGroup
+            value={tempFilters.type}
+            onValueChange={(value) =>
+              setTempFilters((prev) => ({ ...prev, type: value as FilterType["type"] }))
+            }
+            className="flex-row flex-wrap gap-3"
+          >
+            {["All", "Multiple Choice", "True or False"].map((option) => (
+              <View
+                key={option}
+                className="flex-row items-center justify-center mr-3 mb-2"
+              >
+                <RadioGroupItem value={option} id={`type-${option}`} className="border-gray-600" />
+                <Text className="text-base ml-2">{option}</Text>
               </View>
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">Multiple Choice</Text>
-              </View>
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">True or False</Text>
-              </View>
-            </RadioGroup>
-          </View>
+            ))}
+          </RadioGroup>
         </View>
 
-        {/* Sort by type */}
+        {/* Grade */}
         <View className="flex-col gap-2">
-          <Text className="text-lg font-semibold">
-            Grade
-          </Text>
-          <View className="w-full flex-row flex-wrap">
-            <RadioGroup value="20" onValueChange={() => console.log("CHANGED")} className="flex-row">
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">A</Text>
+          <Text className="text-lg font-semibold">Grade</Text>
+          <RadioGroup
+            value={tempFilters.grade}
+            onValueChange={(value) =>
+              setTempFilters((prev) => ({ ...prev, grade: value as FilterType["grade"] }))
+            }
+            className="flex-row flex-wrap gap-3"
+          >
+            {["All", "A", "B", "C", "D", "F"].map((grade) => (
+              <View
+                key={grade}
+                className="flex-row items-center justify-center mr-3 mb-2"
+              >
+                <RadioGroupItem value={grade} id={`grade-${grade}`} className="border-gray-600" />
+                <Text className="text-base ml-2">{grade}</Text>
               </View>
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">B</Text>
-              </View>
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">C</Text>
-              </View>
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">D</Text>
-              </View>
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">F</Text>
-              </View>
-            </RadioGroup>
-          </View>
+            ))}
+          </RadioGroup>
         </View>
 
-        {/* Sort by Date */}
+        {/* Sort By */}
         <View className="flex-col gap-2">
-          <Text className="text-lg font-semibold">
-            Sort by Date
-          </Text>
-          <View className="w-full flex-row flex-wrap">
-            <RadioGroup value="20" onValueChange={() => console.log("CHANGED")} className="flex-row">
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">Latest first</Text>
+          <Text className="text-lg font-semibold">Sort by Date</Text>
+          <RadioGroup
+            value={tempFilters.sortBy}
+            onValueChange={(value) =>
+              setTempFilters((prev) => ({ ...prev, sortBy: value as FilterType["sortBy"] }))
+            }
+            className="flex-row flex-wrap gap-3"
+          >
+            {["Latest First", "Oldest First"].map((sort) => (
+              <View
+                key={sort}
+                className="flex-row items-center justify-center mr-3 mb-2"
+              >
+                <RadioGroupItem value={sort} id={`sort-${sort}`} className="border-gray-600" />
+                <Text className="text-base ml-2">{sort}</Text>
               </View>
-              <View className="flex-row items-center justify-center">
-                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
-                <Text className="text-base ml-2">Oldest first</Text>
-              </View>
-            </RadioGroup>
-          </View>
-
+            ))}
+          </RadioGroup>
         </View>
 
+        {/* Apply Button */}
+        <Pressable
+          onPress={() => {
+            setFilters(tempFilters);
+            toggleSheet();
+          }}
+          className="bg-blue-500 p-3 rounded-xl mt-5"
+        >
+          <Text className="text-white text-center font-medium">Apply Filters</Text>
+        </Pressable>
       </View>
-
-      <Pressable
-        onPress={toggleSheet}
-        className="bg-blue-500 p-3 rounded-xl mt-5"
-      >
-        <Text className="text-white text-center font-medium">Apply Filters</Text>
-      </Pressable>
     </BottomSheet>
   );
 }

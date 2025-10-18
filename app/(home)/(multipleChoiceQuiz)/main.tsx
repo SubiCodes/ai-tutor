@@ -33,6 +33,14 @@ export type QuizData = {
     date: string;
 }
 
+const getGrade = (percentage: number): string => {
+  if (percentage >= 90) return 'A';
+  if (percentage >= 80) return 'B';
+  if (percentage >= 70) return 'C';
+  if (percentage >= 60) return 'D';
+  return 'F';
+};
+
 const Main = () => {
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
     const router = useRouter();
@@ -45,7 +53,35 @@ const Main = () => {
         isFilterOpen.value = !isFilterOpen.value;
     };
     const [filters, setFilters] = useState<{ type: 'All' | 'Multiple Choice' | 'True or False'; sortBy: 'Latest First' | 'Oldest First'; grade: 'All' | 'A' | 'B' | 'C' | 'D' | 'F'; }>({ type: 'All', sortBy: 'Latest First', grade: 'All', });
+    const [filteredQuizResults, setFiteredQuizResults] = useState<QuizData[] | []>([]);
 
+    useEffect(() => {
+        if (!quizResults || quizResults.length === 0) {
+            setFiteredQuizResults([]);
+            return;
+        };
+        let filtered = [...quizResults];
+        //filter by quiz type
+        if (filters.type !== 'All') {
+            filtered = filtered.filter(q => q.type === filters.type);
+        };
+        //filter by grade
+        if (filters.grade !== 'All') {
+            filtered = filtered.filter(q => {
+                const percentage = (q.score / q.total) * 100;
+                const grade = getGrade(percentage);
+                return grade === filters.grade;
+            });
+        };
+        //sort by date
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return filters.sortBy === 'Latest First' ? dateB - dateA : dateA - dateB;
+        });
+        //update the state
+        setFiteredQuizResults(filtered);
+    }, [quizResults, filters]);
 
     const [fileName, setFileName] = useState<string>('File name');
     const [showCreateQuizModal, setShowCreateQuizModal] = useState<boolean>(false);
@@ -134,7 +170,12 @@ const Main = () => {
                     <Sparkles size={16} color={"white"} />
                 </Button>
             </View>
-            <BottomSheetFilterQuizzes isOpen={isFilterOpen} toggleSheet={toggleSheet} />
+            <BottomSheetFilterQuizzes
+                isOpen={isFilterOpen}
+                toggleSheet={toggleSheet}
+                filters={filters}
+                setFilters={setFilters}
+            />
         </SafeAreaView >
     )
 }
