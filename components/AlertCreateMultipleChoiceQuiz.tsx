@@ -52,8 +52,8 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
             if (quizString.trim()) {
                 router.push({
                     pathname: '/(home)/(multipleChoiceQuiz)/quiz',
-                    params: { quizString: quizString }
-                })
+                    params: { quizString, type },
+                });
             };
         } catch (error) {
             console.log("Error Creating Quiz: ", error);
@@ -160,7 +160,7 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                         </Button>
                         <Button onPress={() => onSubmit()} className='bg-blue-500 active:bg-blue-600 items-center justify-center' disabled={creatingQuiz}>
                             {creatingQuiz && (
-                                <ActivityIndicator size={12} color={'white'}/>
+                                <ActivityIndicator size={12} color={'white'} />
                             )}
                             <Text className='bg-transparent active:bg-transparent' onPress={() => onSubmit()}>Start Quiz</Text>
                         </Button>
