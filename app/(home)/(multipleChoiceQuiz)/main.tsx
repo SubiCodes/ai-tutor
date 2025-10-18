@@ -109,7 +109,6 @@ const Main = () => {
                         </View>
                     </>
                 ) : (
-                    // ❌ Empty state when no quiz results
                     <View className="flex-1 w-full items-center justify-center mt-24 px-4">
                         <View className="items-center">
                             <Sparkles size={64} color="#3B82F6" />
