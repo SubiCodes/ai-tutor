@@ -1,17 +1,19 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { QuizData } from '@/app/(home)/(multipleChoiceQuiz)/main'
 import { formatDateFromSQLite } from '@/util/convertTimeString'
+import { useRouter } from 'expo-router'
 
 interface CardQuizResultProps {
     data: QuizData
 }
 
 const CardQuizResult = ({ data }: CardQuizResultProps) => {
-    const { id, quiz, score, total, type, date } = data
+    const router = useRouter();
+    const { id, quiz, score, total, type, date } = data;
 
     // Calculate percentage based on score and total
-    const percentage = Math.round((score / total) * 100)
+    const percentage = Math.round((score / total) * 100);
 
     const getGrade = (percentage: number): string => {
         if (percentage >= 90) return 'A'
@@ -19,7 +21,7 @@ const CardQuizResult = ({ data }: CardQuizResultProps) => {
         if (percentage >= 70) return 'C'
         if (percentage >= 60) return 'D'
         return 'F'
-    }
+    };
 
     const getRemarks = (percentage: number): string => {
         if (percentage >= 90) return 'Excellent Performance'
@@ -27,7 +29,7 @@ const CardQuizResult = ({ data }: CardQuizResultProps) => {
         if (percentage >= 70) return 'Average Performance'
         if (percentage >= 60) return 'Needs Improvement'
         return 'Failed'
-    }
+    };
 
     const grade = getGrade(percentage)
     const remarks = getRemarks(percentage)
@@ -45,7 +47,7 @@ const CardQuizResult = ({ data }: CardQuizResultProps) => {
             default:
                 return 'bg-red-500'
         }
-    }
+    };
 
     const getRemarkColor = (remarks: string) => {
         if (remarks.toLowerCase().includes('excellent') || remarks.toLowerCase().includes('strong')) {
@@ -56,10 +58,19 @@ const CardQuizResult = ({ data }: CardQuizResultProps) => {
             return 'text-red-600'
         }
         return 'text-gray-600'
-    }
+    };
+
+    const handleOpenQuiz = () => {
+        router.push({
+            pathname: "/(home)/(multipleChoiceQuiz)/result",
+            params: { data: JSON.stringify(data) },
+        });
+    };
+
+
 
     return (
-        <View className="bg-white/80 rounded-xl shadow-md flex-row border border-gray-200 items-center justify-between p-4 flex-1">
+        <TouchableOpacity className="bg-white/80 rounded-xl shadow-md flex-row border border-gray-200 items-center justify-between p-4 flex-1" onPress={handleOpenQuiz}>
             {/* Left Section - Score and Grade */}
             <View className="flex-row items-center gap-3 flex-1">
                 {/* Grade Badge */}
@@ -92,7 +103,7 @@ const CardQuizResult = ({ data }: CardQuizResultProps) => {
             <Text className="text-xs text-gray-500 font-medium ml-2">
                 {formatDateFromSQLite(date)}
             </Text>
-        </View>
+        </TouchableOpacity>
     )
 }
 
