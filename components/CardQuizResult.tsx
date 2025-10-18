@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { QuizData } from '@/app/(home)/(multipleChoiceQuiz)/main'
+import { QuizData } from '@/app/(home)/(quizzes)/main'
 import { formatDateFromSQLite } from '@/util/convertTimeString'
 import { useRouter } from 'expo-router'
 
