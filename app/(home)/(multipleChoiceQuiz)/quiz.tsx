@@ -152,8 +152,6 @@ const Quiz = () => {
 
   //#endregion
 
-
-
   //#region Modal State & Handlers for exiting page
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);

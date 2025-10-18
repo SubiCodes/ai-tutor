@@ -33,6 +33,13 @@ export default function AuthLayout() {
             headerShown: true,
           }}
         />
+        <Stack.Screen
+          name="result"
+          options={{
+            title: 'Result',
+            headerShown: true,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
