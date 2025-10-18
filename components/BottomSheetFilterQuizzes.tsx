@@ -50,7 +50,7 @@ export default function BottomSheetFilterQuizzes({
             {["All", "Multiple Choice", "True or False"].map((option) => (
               <View
                 key={option}
-                className="flex-row items-center justify-center mr-3 mb-2"
+                className="flex-row items-center justify-center mr-3"
               >
                 <RadioGroupItem value={option} id={`type-${option}`} className="border-gray-600" />
                 <Text className="text-base ml-2">{option}</Text>
@@ -72,7 +72,7 @@ export default function BottomSheetFilterQuizzes({
             {["All", "A", "B", "C", "D", "F"].map((grade) => (
               <View
                 key={grade}
-                className="flex-row items-center justify-center mr-3 mb-2"
+                className="flex-row items-center justify-center mr-3"
               >
                 <RadioGroupItem value={grade} id={`grade-${grade}`} className="border-gray-600" />
                 <Text className="text-base ml-2">{grade}</Text>
@@ -94,7 +94,7 @@ export default function BottomSheetFilterQuizzes({
             {["Latest First", "Oldest First"].map((sort) => (
               <View
                 key={sort}
-                className="flex-row items-center justify-center mr-3 mb-2"
+                className="flex-row items-center justify-center mr-3"
               >
                 <RadioGroupItem value={sort} id={`sort-${sort}`} className="border-gray-600" />
                 <Text className="text-base ml-2">{sort}</Text>
