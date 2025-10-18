@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity, Pressable } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { deleteQuizzesData, getQuizResults } from '@/db/quizzesFunctions'
+import { deleteQuizData, deleteQuizzesData, getQuizResults } from '@/db/quizzesFunctions'
 import * as SQLite from 'expo-sqlite';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { getDb } from '@/db/db';
@@ -17,6 +17,7 @@ import BottomSheet from '@/components/BottomSheet';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import BottomSheetFilterQuizzes from '@/components/BottomSheetFilterQuizzes';
 import BottomSheetDeleteQuiz from '@/components/BottomSheetDeleteQuiz';
+import Toast, { Toast as ToastFunc } from 'toastify-react-native'
 
 export type QuizQuestion = {
     question: string;
@@ -82,7 +83,6 @@ const Main = () => {
             return filters.sortBy === 'Latest First' ? dateB - dateA : dateA - dateB;
         });
         //update the state
-        console.log(filtered);
         setFiteredQuizResults(filtered);
     }, [quizResults, filters]);
     //#endregion
@@ -92,11 +92,45 @@ const Main = () => {
     const toggleDeleteSheet = () => {
         isDeleteOpen.value = !isDeleteOpen.value;
     };
+
     const [activeId, setActiveId] = useState<number>(0);
+
     const handleQuizLongPress = (id: number) => {
         setActiveId(id);
         toggleDeleteSheet();
+    };
+
+    const handleDeleteQuiz = async () => {
+        ToastFunc.show({
+            type: 'info',
+            text1: 'Deleting Quiz',
+            text2: 'This may take a while.',
+            position: 'bottom',
+        })
+        try {
+            await deleteQuizData(db, activeId);
+            ToastFunc.show({
+                type: 'success',
+                text1: 'Quiz Deleted',
+                text2: 'Quiz Result no longer available',
+                position: 'bottom',
+            });
+            // Filter the quiz results
+            setQuizResults((prev) =>
+                prev.filter((quiz) => quiz.id !== activeId)
+            );
+        } catch (error) {
+            console.log(error);
+            ToastFunc.show({
+                type: 'error',
+                text1: 'An error occured',
+                text2: 'Unable to delete quiz.',
+                position: 'bottom',
+            })
+        }
     }
+
+
     //#endregion
 
     const [fileName, setFileName] = useState<string>('File name');
@@ -115,8 +149,6 @@ const Main = () => {
             }));
 
             setQuizResults(parsedQuizzes);
-
-            console.log(parsedQuizzes);
         } catch (error) {
             console.log("Unable to get the results for quizzes.")
         } finally {
@@ -157,7 +189,7 @@ const Main = () => {
                         <View className="w-full flex-col gap-1">
                             {filteredQuizResults.map((quiz, index) => (
                                 <View key={index} className="bg-card mb-2 rounded-2xl shadow-sm w-full">
-                                    <CardQuizResult data={quiz} longPress={() => handleQuizLongPress(quiz.id)}/>
+                                    <CardQuizResult data={quiz} longPress={() => handleQuizLongPress(quiz.id)} />
                                 </View>
                             ))}
                         </View>
@@ -191,7 +223,7 @@ const Main = () => {
             <BottomSheetDeleteQuiz
                 isOpen={isDeleteOpen}
                 toggleSheet={toggleDeleteSheet}
-                id={activeId}
+                onDelete={handleDeleteQuiz}
             />
         </SafeAreaView >
     )
