@@ -17,7 +17,6 @@ const ViewQuizResult = () => {
       try {
         let result = JSON.parse(data);
         setQuizData(result);
-        console.log(result);
       } catch (error) {
         console.error("Invalid quiz data:", error);
       }

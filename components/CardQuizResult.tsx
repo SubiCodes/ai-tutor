@@ -6,10 +6,11 @@ import { useRouter } from 'expo-router'
 
 interface CardQuizResultProps {
     data: QuizData
-    disabled?: boolean
+    disabled?: boolean;
+    longPress?: () => void
 }
 
-const CardQuizResult = ({ data, disabled }: CardQuizResultProps) => {
+const CardQuizResult = ({ data, disabled, longPress }: CardQuizResultProps) => {
     const router = useRouter();
     const { id, quiz, score, total, type, date } = data;
 
@@ -71,7 +72,7 @@ const CardQuizResult = ({ data, disabled }: CardQuizResultProps) => {
 
 
     return (
-        <TouchableOpacity className="bg-white/80 rounded-xl shadow-md flex-row border border-gray-200 items-center justify-between p-4" onPress={handleOpenQuiz} disabled={disabled}>
+        <TouchableOpacity className="bg-white/80 rounded-xl shadow-md flex-row border border-gray-200 items-center justify-between p-4" onPress={handleOpenQuiz} disabled={disabled} onLongPress={longPress}>
             {/* Left Section - Score and Grade */}
             <View className="flex-row items-center gap-3 flex-1">
                 {/* Grade Badge */}

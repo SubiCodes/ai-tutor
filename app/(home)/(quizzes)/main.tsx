@@ -16,6 +16,7 @@ import { SlidersHorizontal } from 'lucide-react-native';
 import BottomSheet from '@/components/BottomSheet';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import BottomSheetFilterQuizzes from '@/components/BottomSheetFilterQuizzes';
+import BottomSheetDeleteQuiz from '@/components/BottomSheetDeleteQuiz';
 
 export type QuizQuestion = {
     question: string;
@@ -81,8 +82,21 @@ const Main = () => {
             return filters.sortBy === 'Latest First' ? dateB - dateA : dateA - dateB;
         });
         //update the state
+        console.log(filtered);
         setFiteredQuizResults(filtered);
     }, [quizResults, filters]);
+    //#endregion
+
+    //#region Deleting Quiz States and Functions
+    const isDeleteOpen = useSharedValue(false);
+    const toggleDeleteSheet = () => {
+        isDeleteOpen.value = !isDeleteOpen.value;
+    };
+    const [activeId, setActiveId] = useState<number>(0);
+    const handleQuizLongPress = (id: number) => {
+        setActiveId(id);
+        toggleDeleteSheet();
+    }
     //#endregion
 
     const [fileName, setFileName] = useState<string>('File name');
@@ -143,7 +157,7 @@ const Main = () => {
                         <View className="w-full flex-col gap-1">
                             {filteredQuizResults.map((quiz, index) => (
                                 <View key={index} className="bg-card mb-2 rounded-2xl shadow-sm w-full">
-                                    <CardQuizResult data={quiz} />
+                                    <CardQuizResult data={quiz} longPress={() => handleQuizLongPress(quiz.id)}/>
                                 </View>
                             ))}
                         </View>
@@ -162,10 +176,6 @@ const Main = () => {
                     </View>
                 )}
             </ScrollView>
-            {/* <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' onPress={() => deleteAllQuizzes()}>
-                <Text className='text-white font-bold'>Delete</Text>
-                <Sparkles size={16} color={"white"} />
-            </Button> */}
             <View className='w-full'>
                 <Button className='w-full bg-blue-500 active:bg-blue-600 items-center justify-center flex-row' onPress={() => setShowCreateQuizModal(true)}>
                     <Text className='text-white font-bold'>Generate new quiz</Text>
@@ -177,6 +187,11 @@ const Main = () => {
                 toggleSheet={toggleSheet}
                 filters={filters}
                 setFilters={setFilters}
+            />
+            <BottomSheetDeleteQuiz
+                isOpen={isDeleteOpen}
+                toggleSheet={toggleDeleteSheet}
+                id={activeId}
             />
         </SafeAreaView >
     )
