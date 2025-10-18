@@ -34,11 +34,11 @@ export type QuizData = {
 }
 
 const getGrade = (percentage: number): string => {
-  if (percentage >= 90) return 'A';
-  if (percentage >= 80) return 'B';
-  if (percentage >= 70) return 'C';
-  if (percentage >= 60) return 'D';
-  return 'F';
+    if (percentage >= 90) return 'A';
+    if (percentage >= 80) return 'B';
+    if (percentage >= 70) return 'C';
+    if (percentage >= 60) return 'D';
+    return 'F';
 };
 
 const Main = () => {
@@ -48,6 +48,7 @@ const Main = () => {
     const [quizResults, setQuizResults] = useState<QuizData[] | []>([]);
     const [fetchingQuizzes, setFetchingQuizzes] = useState<boolean>(false);
 
+    //#region Filtering States and Functions
     const isFilterOpen = useSharedValue(false);
     const toggleSheet = () => {
         isFilterOpen.value = !isFilterOpen.value;
@@ -82,6 +83,7 @@ const Main = () => {
         //update the state
         setFiteredQuizResults(filtered);
     }, [quizResults, filters]);
+    //#endregion
 
     const [fileName, setFileName] = useState<string>('File name');
     const [showCreateQuizModal, setShowCreateQuizModal] = useState<boolean>(false);
@@ -130,16 +132,16 @@ const Main = () => {
                 <AlertCreateMultipleChoiceQuiz open={showCreateQuizModal} onClose={() => setShowCreateQuizModal(false)} onOpenChange={() => setShowCreateQuizModal(false)} fileName={fileName} type='multiple choice' db={db} router={router} />
             )}
             <ScrollView className="w-full flex-1" showsVerticalScrollIndicator={false}>
-                {quizResults && quizResults.length > 0 ? (
+                <View className="flex-row items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2">
+                    <Text className="text-2xl font-bold text-blue-400 flex-1">Quiz Results</Text>
+                    <TouchableOpacity className="items-center justify-center" onPress={toggleSheet}>
+                        <SlidersHorizontal size={20} color={"#4B5563"} />
+                    </TouchableOpacity>
+                </View>
+                {filteredQuizResults && filteredQuizResults.length > 0 ? (
                     <>
-                        <View className="flex-row items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2">
-                            <Text className='text-2xl font-bold text-blue-400 flex-1'>Quiz Results</Text>
-                            <TouchableOpacity className='items-center justify-center' onPress={toggleSheet}>
-                                <SlidersHorizontal size={20} color={"#4B5563"} />
-                            </TouchableOpacity>
-                        </View>
-                        <View className='w-full flex-col gap-1'>
-                            {quizResults.map((quiz, index) => (
+                        <View className="w-full flex-col gap-1">
+                            {filteredQuizResults.map((quiz, index) => (
                                 <View key={index} className="bg-card mb-2 rounded-2xl shadow-sm w-full">
                                     <CardQuizResult data={quiz} />
                                 </View>
@@ -151,10 +153,10 @@ const Main = () => {
                         <View className="items-center">
                             <Sparkles size={64} color="#3B82F6" />
                             <Text className="text-xl font-bold text-foreground mt-4">
-                                No quizzes yet
+                                No quizzes found
                             </Text>
                             <Text className="text-center text-muted-foreground mt-2">
-                                You haven’t created any quizzes yet. Tap below to generate your first one!
+                                Try adjusting your filters or create your first quiz!
                             </Text>
                         </View>
                     </View>

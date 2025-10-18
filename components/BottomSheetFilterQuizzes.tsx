@@ -27,8 +27,10 @@ export default function BottomSheetFilterQuizzes({
 
   // Sync tempFilters with parent filters when sheet opens
   useEffect(() => {
-    setTempFilters(filters);
-  }, [filters, isOpen.value]);
+    if (isOpen.value) {
+      setTempFilters(filters);
+    }
+  }, [isOpen]);
 
   return (
     <BottomSheet isOpen={isOpen} toggleSheet={toggleSheet}>
