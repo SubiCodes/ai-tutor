@@ -134,9 +134,9 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
 
                             <View className="w-full flex-col gap-4 mb-4">
                                 <Text className="text-foreground/80 font-semibold text-base">Type of Quiz</Text>
-                                <RadioGroup value={amount} onValueChange={onValueChangeType} className='flex-row flex-wrap'>
+                                <RadioGroup value={type} onValueChange={onValueChangeType} className='flex-row flex-wrap'>
                                     <View className="flex flex-row items-center gap-3">
-                                        <RadioGroupItem value="Multiple Choice'" id="r1" />
+                                        <RadioGroupItem value="Multiple Choice" id="r1" />
                                         <Label htmlFor="r1" onPress={onLabelPressType('Multiple Choice')} className='font-normal'>
                                             Multiple Choice
                                         </Label>
