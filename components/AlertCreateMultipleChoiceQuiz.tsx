@@ -49,7 +49,6 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
             if (amount === '10 questions') { total = 10 };
             if (amount === '15 questions') { total = 15 };
             const quizString = await createQuizzesString(db, total, type);
-            onClose();
             if (quizString.trim()) {
                 router.push({
                     pathname: '/(home)/(multipleChoiceQuiz)/quiz',
@@ -126,7 +125,7 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                         </View>
                     </View>
                 </AlertDialogDescription>
-                <AlertDialogFooter>
+                <View className='w-full'>
                     <View className="flex-row w-full items-end justify-end gap-2 mt-2">
                         <Button onPress={() => onClose()} className='bg-muted' disabled={creatingQuiz}>
                             <Text className='text-black'>Cancel</Text>
@@ -138,7 +137,7 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
                             <Text className='bg-transparent active:bg-transparent' onPress={() => onSubmit()}>Start Quiz</Text>
                         </Button>
                     </View>
-                </AlertDialogFooter>
+                </View>
             </AlertDialogContent>
             <Toast />
         </AlertDialog>

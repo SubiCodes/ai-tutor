@@ -39,12 +39,13 @@ const HomeLandingPage = () => {
         setFile(currentFile);
     };
 
+    //#region Uploading, Deleting and Replacing of file 
     const pickFile = async () => {
         if (!db) {
             console.warn("Database not ready yet!");
             return;
         }
-        
+
         try {
             const result = await DocumentPicker.getDocumentAsync({
                 type: [
@@ -135,9 +136,12 @@ const HomeLandingPage = () => {
         ]);
     };
 
-    const openPage = (page: Route) => {
-        const currentFile = AsyncStorage.getItem("tutorKnowledge");
-        if (!currentFile) {
+    //#endregion
+
+    const openPage = async (page: Route) => {
+        const currentFile = await AsyncStorage.getItem("tutorKnowledge");
+        console.log("I am pressed: ", currentFile)
+        if (!currentFile || !file) {
             ToastFunc.show({
                 type: 'warn',
                 text1: 'Upload a file first!',
