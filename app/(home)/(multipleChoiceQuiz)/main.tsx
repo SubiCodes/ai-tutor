@@ -37,13 +37,15 @@ const Main = () => {
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
     const router = useRouter();
 
+    const [quizResults, setQuizResults] = useState<QuizData[] | []>([]);
+    const [fetchingQuizzes, setFetchingQuizzes] = useState<boolean>(false);
+
     const isFilterOpen = useSharedValue(false);
     const toggleSheet = () => {
         isFilterOpen.value = !isFilterOpen.value;
     };
+    const [filters, setFilters] = useState<{ type: 'All' | 'Multiple Choice' | 'True or False'; sortBy: 'Latest First' | 'Oldest First'; grade: 'All' | 'A' | 'B' | 'C' | 'D' | 'F'; }>({ type: 'All', sortBy: 'Latest First', grade: 'All', });
 
-    const [quizResults, setQuizResults] = useState<QuizData[] | []>([]);
-    const [fetchingQuizzes, setFetchingQuizzes] = useState<boolean>(false);
 
     const [fileName, setFileName] = useState<string>('File name');
     const [showCreateQuizModal, setShowCreateQuizModal] = useState<boolean>(false);
