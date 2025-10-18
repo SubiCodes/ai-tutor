@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, { SharedValue } from "react-native-reanimated";
 import BottomSheet from "./BottomSheet";
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 type FilterBottomSheetProps = {
   isOpen: SharedValue<boolean>;
@@ -14,22 +15,87 @@ export default function BottomSheetFilterQuizzes({
 }: FilterBottomSheetProps) {
   return (
     <BottomSheet isOpen={isOpen} toggleSheet={toggleSheet}>
-      <Animated.Text className="text-gray-800 dark:text-gray-200 text-base mb-3">
+      <Animated.Text className="text-gray-800 dark:text-gray-200 text-2xl mb-3 font-extrabold">
         Filter Options
       </Animated.Text>
 
-      <View className="space-y-3">
-        <Pressable className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded-xl">
-          <Text className="text-black dark:text-white">Newest</Text>
-        </Pressable>
+      {/* Main Content */}
+      <View className="flex-1 p-2 flex-col gap-4">
 
-        <Pressable className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded-xl">
-          <Text className="text-black dark:text-white">Most Popular</Text>
-        </Pressable>
+        {/* Sort by type */}
+        <View className="flex-col gap-2">
+          <Text className="text-lg font-semibold">
+            Quiz Type
+          </Text>
+          <View className="w-full flex-row flex-wrap">
+            <RadioGroup value="20" onValueChange={() => console.log("CHANGED")} className="flex-row">
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">All</Text>
+              </View>
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">Multiple Choice</Text>
+              </View>
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">True or False</Text>
+              </View>
+            </RadioGroup>
+          </View>
+        </View>
 
-        <Pressable className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded-xl">
-          <Text className="text-black dark:text-white">By Category</Text>
-        </Pressable>
+        {/* Sort by type */}
+        <View className="flex-col gap-2">
+          <Text className="text-lg font-semibold">
+            Grade
+          </Text>
+          <View className="w-full flex-row flex-wrap">
+            <RadioGroup value="20" onValueChange={() => console.log("CHANGED")} className="flex-row">
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">A</Text>
+              </View>
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">B</Text>
+              </View>
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">C</Text>
+              </View>
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">D</Text>
+              </View>
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">F</Text>
+              </View>
+            </RadioGroup>
+          </View>
+        </View>
+
+        {/* Sort by Date */}
+        <View className="flex-col gap-2">
+          <Text className="text-lg font-semibold">
+            Sort by Date
+          </Text>
+          <View className="w-full flex-row flex-wrap">
+            <RadioGroup value="20" onValueChange={() => console.log("CHANGED")} className="flex-row">
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">Latest first</Text>
+              </View>
+              <View className="flex-row items-center justify-center">
+                <RadioGroupItem value="default" id="r1" className="border-gray-600"/>
+                <Text className="text-base ml-2">Oldest first</Text>
+              </View>
+            </RadioGroup>
+          </View>
+
+        </View>
+
       </View>
 
       <Pressable
