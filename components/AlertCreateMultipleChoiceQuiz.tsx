@@ -26,13 +26,13 @@ interface AlertOverlayProps {
     onOpenChange: (open: boolean) => void;
     onClose: () => void;
     fileName: string;
-    type: string;
     db: SQLite.SQLiteDatabase
     router: Router
 }
 
-const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, type, db, router }: AlertOverlayProps) => {
+const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, db, router }: AlertOverlayProps) => {
     const [amount, setAmount] = useState<string>('5 questions');
+    const [type, setType] = useState<"Multiple Choice" | "True or False">('Multiple Choice')
     const [creatingQuiz, setCreatinguiz] = useState<boolean>(false);
 
     const onSubmit = async () => {
@@ -62,14 +62,24 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
         }
     }
 
-    function onLabelPress(amount: string) {
+    function onLabelPressAmount(amount: string) {
         return () => {
             setAmount(amount);
         };
     }
 
-    function onValueChange(amount: string) {
+    function onValueChangeAmount(amount: string) {
         setAmount(amount);
+    }
+
+    function onLabelPressType(type: "Multiple Choice" | "True or False") {
+        return () => {
+            setType(type);
+        };
+    }
+
+    function onValueChangeType(type: "Multiple Choice" | "True or False") {
+        setType(type);
     }
 
     return (
@@ -100,23 +110,41 @@ const AlertCreateMultipleChoiceQuiz = ({ open, onOpenChange, onClose, fileName, 
 
                             <View className="w-full flex-col gap-4 mb-4">
                                 <Text className="text-foreground/80 font-semibold text-base">Number of Questions</Text>
-                                <RadioGroup value={amount} onValueChange={onValueChange} className='flex-row flex-wrap'>
+                                <RadioGroup value={amount} onValueChange={onValueChangeAmount} className='flex-row flex-wrap'>
                                     <View className="flex flex-row items-center gap-3">
                                         <RadioGroupItem value="5 questions" id="r1" />
-                                        <Label htmlFor="r1" onPress={onLabelPress('5 questions')} className='font-normal'>
+                                        <Label htmlFor="r1" onPress={onLabelPressAmount('5 questions')} className='font-normal'>
                                             5 items
                                         </Label>
                                     </View>
                                     <View className="flex flex-row items-center gap-3">
                                         <RadioGroupItem value="10 questions" id="r2" />
-                                        <Label htmlFor="r2" onPress={onLabelPress('10 questions')} className='font-normal'>
+                                        <Label htmlFor="r2" onPress={onLabelPressAmount('10 questions')} className='font-normal'>
                                             10 items
                                         </Label>
                                     </View>
                                     <View className="flex flex-row items-center gap-3">
                                         <RadioGroupItem value="15 questions" id="r3" />
-                                        <Label htmlFor="r3" onPress={onLabelPress('15 questions')} className='font-normal'>
+                                        <Label htmlFor="r3" onPress={onLabelPressAmount('15 questions')} className='font-normal'>
                                             15 items
+                                        </Label>
+                                    </View>
+                                </RadioGroup>
+                            </View>
+
+                            <View className="w-full flex-col gap-4 mb-4">
+                                <Text className="text-foreground/80 font-semibold text-base">Type of Quiz</Text>
+                                <RadioGroup value={amount} onValueChange={onValueChangeType} className='flex-row flex-wrap'>
+                                    <View className="flex flex-row items-center gap-3">
+                                        <RadioGroupItem value="Multiple Choice'" id="r1" />
+                                        <Label htmlFor="r1" onPress={onLabelPressType('Multiple Choice')} className='font-normal'>
+                                            Multiple Choice
+                                        </Label>
+                                    </View>
+                                    <View className="flex flex-row items-center gap-3">
+                                        <RadioGroupItem value="True or False" id="r2" />
+                                        <Label htmlFor="r2" onPress={onLabelPressType('True or False')} className='font-normal'>
+                                            True or False
                                         </Label>
                                     </View>
                                 </RadioGroup>

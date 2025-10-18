@@ -58,14 +58,14 @@ export const createQuizzesString = async (db: SQLite.SQLiteDatabase, amount: num
         const allRows = await getAllEmbeddings(db);
         const fullLecture = allRows.map((r) => r.text).join("\n\n");
 
-        const quizTypePrompt = type === "multiple choice"
+        const quizTypePrompt = type === "Multiple Choice"
             ? `[ 
                 { "question": "question here", "answer": "a, b, c or d", "choices": "a) choice ** b) choice ** c )choice ** d) choice " },
                 { "question": "question here", "answer": "a, b, c or d", "choices": "choices here" }
                 ]`
             : `[
-                { "question": "question here", "answer": "true or false"},
-                { "question": "question here", "answer": "true or false"}
+                { "question": "question here", "answer": "True or False"},
+                { "question": "question here", "answer": "True or False"}
             ]`;
 
         const CHUNK_SIZE = 10000;

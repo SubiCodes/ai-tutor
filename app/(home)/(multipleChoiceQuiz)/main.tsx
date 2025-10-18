@@ -129,7 +129,7 @@ const Main = () => {
     return (
         <SafeAreaView className="flex-1 justify-start items-start bg-background px-4 pt-4 py-4" edges={["left", "right", "bottom"]}>
             {db && (
-                <AlertCreateMultipleChoiceQuiz open={showCreateQuizModal} onClose={() => setShowCreateQuizModal(false)} onOpenChange={() => setShowCreateQuizModal(false)} fileName={fileName} type='multiple choice' db={db} router={router} />
+                <AlertCreateMultipleChoiceQuiz open={showCreateQuizModal} onClose={() => setShowCreateQuizModal(false)} onOpenChange={() => setShowCreateQuizModal(false)} fileName={fileName} db={db} router={router} />
             )}
             <ScrollView className="w-full flex-1" showsVerticalScrollIndicator={false}>
                 <View className="flex-row items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2">
