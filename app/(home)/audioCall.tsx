@@ -18,23 +18,34 @@ interface Content {
 export default function AudioCall() {
     const { startRecording, recorderState, recordingPhase, stopRecording } = useAudioRecorderUtil();
 
+    const [callState, setCallState] = useState<string>(recordingPhase);
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
 
     const isInCallRef = useRef(false);
     const [isInCall, setIsInCall] = useState(false);
+
     const [conversationHistory, setConversationHistory] = useState<Content[]>([]);
+
+    useEffect(() => {
+        if (isInCall) {
+            setCallState(recordingPhase);
+        }
+    }, [recordingPhase, isInCall]);
 
     const handleStartCall = async () => {
         isInCallRef.current = true;
         setIsInCall(true);
+        setCallState(recordingPhase);
         try {
             while (isInCallRef.current) {
+                setCallState(recordingPhase);
                 const uri = await startRecording();
                 if (!isInCallRef.current) break;
-
+                
                 const text = await transcribeAudioWithGemini(uri);
                 console.log('User said:', text);
 
+                setCallState('Thinking...');
                 const aiResponse = await getAIResponse(conversationHistory, text, db);
                 console.log('AI responded:', aiResponse);
 
@@ -43,6 +54,8 @@ export default function AudioCall() {
                     { role: 'user', parts: [{ text }] },
                     { role: 'model', parts: [{ text: aiResponse }] },
                 ]);
+
+                setCallState('playing response...');
             }
         } catch (error) {
             console.error('Error in call:', error);
@@ -82,7 +95,7 @@ export default function AudioCall() {
                 </View>
                 <View className='w-full items-center justify-center mt-2'>
                     <Text className='text-md text-muted-foreground italic'>
-                        {isInCall ? recordingPhase : 'Start a call with your tutor'}
+                        {isInCall ? callState : 'Start a call with your tutor'}
                     </Text>
                 </View>
             </View>
