@@ -48,7 +48,7 @@ export function useAudioRecorderUtil() {
   useEffect(() => {
     if (recorderState.isRecording && typeof recorderState.metering === 'number') {
       const SILENCE_THRESHOLD = -20; // adjust as needed
-      const SILENCE_DURATION = 1000; // 1 second
+      const SILENCE_DURATION = 1500; // 1.5 second
       const now = Date.now();
 
       if (recorderState.metering < SILENCE_THRESHOLD) {
