@@ -41,7 +41,7 @@ export default function AudioCall() {
                 setCallState(recordingPhase);
                 const uri = await startRecording();
                 if (!isInCallRef.current) break;
-                
+
                 const text = await transcribeAudioWithGemini(uri);
                 console.log('User said:', text);
 
@@ -100,7 +100,7 @@ export default function AudioCall() {
                 </View>
             </View>
             {!isInCall ? (
-                <View className='absolute bottom-48'>
+                <View className='absolute bottom-44'>
                     <Button
                         className='w-16 h-16 rounded-full bg-green-400 active:bg-green-400 flex items-center justify-center'
                         onPress={handleStartCall}
@@ -109,7 +109,7 @@ export default function AudioCall() {
                     </Button>
                 </View>
             ) : (
-                <View className='absolute bottom-48'>
+                <View className='absolute bottom-44'>
                     <Button
                         className='w-16 h-16 rounded-full bg-red-400 active:bg-red-400 flex items-center justify-center'
                         onPress={handleEndCall}
