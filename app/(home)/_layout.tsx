@@ -47,6 +47,13 @@ export default function AuthLayout() {
             headerShown: true,
           }}
         />
+        <Stack.Screen
+          name="audioCall"
+          options={{
+            title: 'Call your AI Tutor',
+            headerShown: true,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

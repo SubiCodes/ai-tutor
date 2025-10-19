@@ -287,7 +287,7 @@ const HomeLandingPage = () => {
                         Call to your tutor
                     </Text>
                     <View className="w-full flex-row gap-2 items-center justify-center">
-                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => Alert.alert("Feature coming soon!")}>
+                        <TouchableOpacity className="flex-1 max-h-24 items-center justify-center rounded-lg overflow-hidden" onPress={() => openPage('/(home)/audioCall')}>
                             <LinearGradient
                                 colors={["#8B5CF6", "#6366F1"]} // violet-500 → indigo-500
                                 start={{ x: 0, y: 0 }}
