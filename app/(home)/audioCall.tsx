@@ -8,6 +8,7 @@ import transcribeAudioWithGemini from '@/util/speechToText';
 import * as SQLite from 'expo-sqlite';
 import { getAIResponse } from '@/util/conversationalAI';
 import { getDb } from '@/db/db';
+import * as Speech from 'expo-speech';
 
 interface Content {
     role: 'user' | 'model';
@@ -68,6 +69,7 @@ export default function AudioCall() {
     const handleEndCall = async () => {
         isInCallRef.current = false;
         await stopRecording();
+        Speech.stop();
         setIsInCall(false);
         setConversationHistory([]);
     };

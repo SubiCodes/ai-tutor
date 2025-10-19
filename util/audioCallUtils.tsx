@@ -24,8 +24,8 @@ export function useAudioRecorderUtil() {
   const silenceStartTime = useRef<number | null>(null);
   const hasSpoken = useRef(false);
   const stopPromiseRef = useRef<((uri: string) => void) | null>(null);
+  const isStoppingRef = useRef(false);
 
-  // --- Permissions and audio mode setup ---
   useEffect(() => {
     (async () => {
       const status = await AudioModule.requestRecordingPermissionsAsync();
@@ -40,12 +40,12 @@ export function useAudioRecorderUtil() {
     })();
   }, []);
 
-  // --- Core Functions ---
   const startRecording = async (): Promise<string> => {
     await recorder.prepareToRecordAsync();
     recorder.record();
 
     hasSpoken.current = false;
+    isStoppingRef.current = false;
     setRecordingPhase('Waiting for you to speak...');
 
     return new Promise((resolve) => {
@@ -54,28 +54,36 @@ export function useAudioRecorderUtil() {
   };
 
   const stopRecording = async (): Promise<string> => {
-    await recorder.stop();
+    if (isStoppingRef.current) {
+      return recorder.uri;
+    }
+    
+    isStoppingRef.current = true;
+
+    if (recorderState.isRecording) {
+      await recorder.stop();
+    }
+    
     setRecordingPhase('');
     return recorder.uri;
   };
 
   const speakAsync = (text: string): Promise<void> => {
     return new Promise((resolve) => {
-        Speech.speak(text, {
-            onDone: () => {
-                resolve();
-            },
-            onError: (error) => {
-                console.error('Speech error:', error);
-                resolve();
-            }
-        });
+      Speech.speak(text, {
+        onDone: () => {
+          resolve();
+        },
+        onError: (error) => {
+          console.error('Speech error:', error);
+          resolve();
+        }
+      });
     });
-};
+  };
 
-  // --- Silence Detection Logic ---
   useEffect(() => {
-    if (!recorderState.isRecording || typeof recorderState.metering !== 'number') {
+    if (!recorderState.isRecording || typeof recorderState.metering !== 'number' || isStoppingRef.current) {
       silenceStartTime.current = null;
       return;
     }
