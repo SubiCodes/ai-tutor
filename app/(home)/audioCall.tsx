@@ -4,6 +4,8 @@ import { useAudioRecorderUtil } from '@/util/audioCallUtils';
 import LiveAudioWaveform from '@/components/LiveAudioWaveForm';
 import { Button } from '@/components/ui/button';
 import { PhoneCall } from 'lucide-react-native';
+import transcribeAudioWithGemini from '@/util/speechToText';
+
 
 export default function AudioCall() {
     const { startRecording, recorderState, recordingPhase, stopRecording } = useAudioRecorderUtil();
@@ -18,7 +20,8 @@ export default function AudioCall() {
                 const uri = await startRecording();
                 if (!isInCallRef.current) break;
 
-                // const text = await sendToSTT(uri);
+                const text = await transcribeAudioWithGemini(uri);
+                console.log(text);
                 // const aiResponse = await sendToAI(text);
                 // await playTTS(aiResponse);
             }
