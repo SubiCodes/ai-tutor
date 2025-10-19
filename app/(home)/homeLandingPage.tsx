@@ -140,7 +140,6 @@ const HomeLandingPage = () => {
 
     const openPage = async (page: Route) => {
         const currentFile = await AsyncStorage.getItem("tutorKnowledge");
-        console.log("I am pressed: ", currentFile)
         if (!currentFile || !file) {
             ToastFunc.show({
                 type: 'warn',

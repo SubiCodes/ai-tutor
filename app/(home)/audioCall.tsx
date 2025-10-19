@@ -5,7 +5,6 @@ import LiveAudioWaveform from '@/components/LiveAudioWaveForm';
 import { Button } from '@/components/ui/button';
 import { PhoneCall } from 'lucide-react-native';
 import transcribeAudioWithGemini from '@/util/speechToText';
-
 import * as SQLite from 'expo-sqlite';
 import { getAIResponse } from '@/util/conversationalAI';
 import { getDb } from '@/db/db';
@@ -16,9 +15,9 @@ interface Content {
 }
 
 export default function AudioCall() {
-    const { startRecording, recorderState, recordingPhase, stopRecording } = useAudioRecorderUtil();
+    const { startRecording, recorderState, recordingPhase, stopRecording, speakAsync } = useAudioRecorderUtil();
 
-    const [callState, setCallState] = useState<string>(recordingPhase);
+    const [callState, setCallState] = useState<string>('Waiting for you to speak...');
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
 
     const isInCallRef = useRef(false);
@@ -42,12 +41,11 @@ export default function AudioCall() {
                 const uri = await startRecording();
                 if (!isInCallRef.current) break;
 
+                setCallState('Understanding your question...');
                 const text = await transcribeAudioWithGemini(uri);
-                console.log('User said:', text);
 
-                setCallState('Thinking...');
+                setCallState('Looking through your notes...');
                 const aiResponse = await getAIResponse(conversationHistory, text, db);
-                console.log('AI responded:', aiResponse);
 
                 setConversationHistory(prev => [
                     ...prev,
@@ -55,7 +53,8 @@ export default function AudioCall() {
                     { role: 'model', parts: [{ text: aiResponse }] },
                 ]);
 
-                setCallState('playing response...');
+                setCallState('Answering...');
+                await speakAsync(aiResponse);
             }
         } catch (error) {
             console.error('Error in call:', error);
