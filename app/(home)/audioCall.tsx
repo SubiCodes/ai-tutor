@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { useAudioRecorderUtil } from '@/util/audioCallUtils';
 import LiveAudioWaveform from '@/components/LiveAudioWaveForm';
@@ -6,11 +6,23 @@ import { Button } from '@/components/ui/button';
 import { PhoneCall } from 'lucide-react-native';
 import transcribeAudioWithGemini from '@/util/speechToText';
 
+import * as SQLite from 'expo-sqlite';
+import { getAIResponse } from '@/util/conversationalAI';
+import { getDb } from '@/db/db';
+
+interface Content {
+    role: 'user' | 'model';
+    parts: { text: string }[];
+}
 
 export default function AudioCall() {
     const { startRecording, recorderState, recordingPhase, stopRecording } = useAudioRecorderUtil();
+
+    const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+
     const isInCallRef = useRef(false);
     const [isInCall, setIsInCall] = useState(false);
+    const [conversationHistory, setConversationHistory] = useState<Content[]>([]);
 
     const handleStartCall = async () => {
         isInCallRef.current = true;
@@ -21,10 +33,19 @@ export default function AudioCall() {
                 if (!isInCallRef.current) break;
 
                 const text = await transcribeAudioWithGemini(uri);
-                console.log(text);
-                // const aiResponse = await sendToAI(text);
-                // await playTTS(aiResponse);
+                console.log('User said:', text);
+
+                const aiResponse = await getAIResponse(conversationHistory, text, db);
+                console.log('AI responded:', aiResponse);
+
+                setConversationHistory(prev => [
+                    ...prev,
+                    { role: 'user', parts: [{ text }] },
+                    { role: 'model', parts: [{ text: aiResponse }] },
+                ]);
             }
+        } catch (error) {
+            console.error('Error in call:', error);
         } finally {
             await stopRecording();
             setIsInCall(false);
@@ -36,11 +57,18 @@ export default function AudioCall() {
         isInCallRef.current = false;
         await stopRecording();
         setIsInCall(false);
+        setConversationHistory([]);
     };
+
+    useEffect(() => {
+        (async () => {
+            const database = await getDb();
+            setDb(database);
+        })();
+    }, []);
 
     return (
         <View className='flex-1 items-center justify-center pb-24'>
-            {/* Icon and State Holder */}
             <View className='w-full flex-col items-center justify-center mb-4'>
                 <View className="w-44 h-44 border-2 border-blue-400 items-center justify-center rounded-full overflow-hidden mb-4">
                     <Image
@@ -49,21 +77,15 @@ export default function AudioCall() {
                         resizeMode="cover"
                     />
                 </View>
-
-                {/* Waveform */}
                 <View className='w-44 max-w-44 items-center justify-center'>
                     {isInCall ? <LiveAudioWaveform metering={recorderState?.metering} /> : null}
                 </View>
-
-                {/* Recording phase text */}
                 <View className='w-full items-center justify-center mt-2'>
                     <Text className='text-md text-muted-foreground italic'>
                         {isInCall ? recordingPhase : 'Start a call with your tutor'}
                     </Text>
                 </View>
             </View>
-
-            {/* Call button - positioned absolutely */}
             {!isInCall ? (
                 <View className='absolute bottom-48'>
                     <Button
