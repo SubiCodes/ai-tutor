@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { useAudioRecorderUtil } from '@/util/audioCallUtils';
 import LiveAudioWaveform from '@/components/LiveAudioWaveForm';
@@ -6,19 +6,33 @@ import { Button } from '@/components/ui/button';
 import { PhoneCall } from 'lucide-react-native';
 
 export default function AudioCall() {
-    const { startRecording, recorderState, recordingPhase } = useAudioRecorderUtil();
-    const [isInCall, setIsInCall] = useState<boolean>(false);
+    const { startRecording, recorderState, recordingPhase, stopRecording } = useAudioRecorderUtil();
+    const isInCallRef = useRef(false);
+    const [isInCall, setIsInCall] = useState(false);
 
     const handleStartCall = async () => {
+        isInCallRef.current = true;
         setIsInCall(true);
         try {
-            const uri = await startRecording();
-            console.log('Recording stopped, file saved at:', uri);
-        } catch (error) {
-            console.error('Error starting recording:', error);
+            while (isInCallRef.current) {
+                const uri = await startRecording();
+                if (!isInCallRef.current) break;
+
+                // const text = await sendToSTT(uri);
+                // const aiResponse = await sendToAI(text);
+                // await playTTS(aiResponse);
+            }
         } finally {
+            await stopRecording();
             setIsInCall(false);
+            isInCallRef.current = false;
         }
+    };
+
+    const handleEndCall = async () => {
+        isInCallRef.current = false;
+        await stopRecording();
+        setIsInCall(false);
     };
 
     return (
@@ -35,7 +49,7 @@ export default function AudioCall() {
 
                 {/* Waveform */}
                 <View className='w-44 max-w-44 items-center justify-center'>
-                     {isInCall ? <LiveAudioWaveform metering={recorderState?.metering} />: null}
+                    {isInCall ? <LiveAudioWaveform metering={recorderState?.metering} /> : null}
                 </View>
 
                 {/* Recording phase text */}
@@ -47,11 +61,20 @@ export default function AudioCall() {
             </View>
 
             {/* Call button - positioned absolutely */}
-            {!isInCall && (
+            {!isInCall ? (
                 <View className='absolute bottom-48'>
                     <Button
                         className='w-16 h-16 rounded-full bg-green-400 active:bg-green-400 flex items-center justify-center'
                         onPress={handleStartCall}
+                    >
+                        <PhoneCall color='white' size={20} />
+                    </Button>
+                </View>
+            ) : (
+                <View className='absolute bottom-48'>
+                    <Button
+                        className='w-16 h-16 rounded-full bg-red-400 active:bg-red-400 flex items-center justify-center'
+                        onPress={handleEndCall}
                     >
                         <PhoneCall color='white' size={20} />
                     </Button>
